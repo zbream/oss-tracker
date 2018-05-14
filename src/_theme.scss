@@ -1,5 +1,14 @@
 @import '~@angular/material/theming';
 @import './palette.scss';
+@import './app/app.theme.scss';
+@import './app/shared/components/command-bar/command-bar.theme.scss';
+@import './app/views/issues/issues.theme.scss';
+@import './app/views/releases/releases.theme.scss';
 
 @include mat-core();
 @include angular-material-theme($app-theme);
+
+@include app-theme($app-theme);
+@include command-bar-theme($app-theme);
+@include issues-theme($app-theme);
+@include releases-theme($app-theme);

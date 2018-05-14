@@ -1,4 +1,20 @@
-<h1>Issues</h1>
-<div *ngFor="let issue of _issues$ | async">
-  {{ issue | json }}
+<div fxFlexFill fxLayout="column">
+
+  <div class="issues-header">
+    <oss-command-bar
+      [filterFormControl]="_filterFormControl"
+      [refreshing]="_refreshInProgress$ | async"
+      (add)="_onAdd()"
+      (refresh)="_onRefresh()">
+    </oss-command-bar>
+  </div>
+
+  <div class="issues-content" fxFlex="grow">
+    <div class="issues-content__container">
+      <ng-container *ngFor="let issue of _filteredIssues$ | async; trackBy: _trackByFn">
+        <div>{{ issue | json }}</div>
+      </ng-container>
+    </div>
+  </div>
+
 </div>

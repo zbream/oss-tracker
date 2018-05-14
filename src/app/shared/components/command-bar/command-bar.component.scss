@@ -1,0 +1,17 @@
+.command-bar {
+  max-height: 48px;
+}
+
+.command-bar-filter__prefix {
+  margin: 0 6px;
+}
+
+.refreshing {
+  animation: spin 750ms ease-in-out infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}

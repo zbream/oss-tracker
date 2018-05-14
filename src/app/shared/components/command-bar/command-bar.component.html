@@ -1,0 +1,20 @@
+<mat-toolbar class="command-bar">
+  <span fxFlex></span>
+  <mat-form-field floatLabel="never" fxFlex="0 1 500px">
+    <span matPrefix class="command-bar-filter__prefix">
+      Filter:
+    </span>
+    <input matInput type="text" [formControl]="filterFormControl">
+    <button matSuffix mat-icon-button (click)="_onClear()" *ngIf="filterFormControl.value">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+  <span fxFlex fxLayoutAlign="end">
+    <button mat-icon-button (click)="_onAdd()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button mat-icon-button (click)="_onRefresh()">
+      <mat-icon [class.refreshing]="refreshing">refresh</mat-icon>
+    </button>
+  </span>
+</mat-toolbar>

@@ -1,4 +1,20 @@
-<h1>Releases</h1>
-<div *ngFor="let project of _projects$ | async">
-  {{ project | json }}
+<div fxFlexFill fxLayout="column">
+
+  <div class="releases-header">
+    <oss-command-bar
+      [filterFormControl]="_filterFormControl"
+      [refreshing]="_refreshInProgress$ | async"
+      (add)="_onAdd()"
+      (refresh)="_onRefresh()">
+    </oss-command-bar>
+  </div>
+
+  <div class="releases-content" fxFlex="grow">
+    <div class="releases-content__container">
+      <ng-container *ngFor="let project of _filteredProjects$ | async; trackBy: _trackByFn">
+        <div>{{ project | json }}</div>
+      </ng-container>
+    </div>
+  </div>
+
 </div>

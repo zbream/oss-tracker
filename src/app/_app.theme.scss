@@ -1,0 +1,13 @@
+@import '~@angular/material/theming';
+
+@mixin app-theme($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+
+  .app-header {
+    @include mat-elevation(1);
+
+    z-index: 2;
+    border-bottom: 1px solid mat-color($primary, darker);
+  }
+}

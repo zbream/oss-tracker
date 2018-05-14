@@ -1,5 +1,35 @@
-<a routerLink="/issues">Issues</a>
-<br>
-<a routerLink="/releases">Releases</a>
-<hr>
-<router-outlet></router-outlet>
+<div fxFlexFill fxLayout="column">
+
+  <header class="app-header">
+    <div fxHide.xs>
+      <mat-toolbar class="app-header-title__toolbar" color="primary">
+        <span fxFlex></span>
+        <span>OSS Project & Issue Tracker</span>
+        <span fxFlex fxLayoutAlign="end">
+          <a mat-icon-button href="mailto:zack.ream@hyland.com">
+            <mat-icon>help</mat-icon>
+          </a>
+        </span>
+      </mat-toolbar>
+    </div>
+    <nav mat-tab-nav-bar backgroundColor="primary" color="accent">
+      <span fxFlex></span>
+      <a mat-tab-link routerLink="/releases" fxFlex="0 1 400px"
+        routerLinkActive #rActive="routerLinkActive" [active]="rActive.isActive">
+        <mat-icon class="app-header-nav__icon" fxHide.xs>code</mat-icon>
+        <span>Project Releases</span>
+      </a>
+      <a mat-tab-link routerLink="/issues" fxFlex="0 1 400px"
+        routerLinkActive #iActive="routerLinkActive" [active]="iActive.isActive">
+        <mat-icon class="app-header-nav__icon" fxHide.xs>bug_report</mat-icon>
+        <span>Tracked Issues</span>
+      </a>
+      <span fxFlex></span>
+    </nav>
+  </header>
+
+  <main fxFlex="grow" class="app-content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>
