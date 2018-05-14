@@ -10,6 +10,9 @@
     ]
   },
   "hosting": {
+    "predeploy": [
+      "./node_modules/.bin/cpx \"dist/oss-tracker/**/*\" \"$RESOURCE_DIR\" --clean"
+    ],
     "public": "public",
     "ignore": [
       "firebase.json",

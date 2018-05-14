@@ -9,7 +9,8 @@
     "lint": "npm run lint:ts && npm run lint:style",
     "lint:ts": "ng lint",
     "lint:style": "stylelint \"@(src|projects)/**/*.?(s)css\"",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "publish": "ng build --prod && firebase deploy"
   },
   "private": true,
   "dependencies": {
@@ -40,6 +41,7 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.2.1",
+    "cpx": "^1.5.0",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~1.7.1",
