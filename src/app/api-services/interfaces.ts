@@ -9,9 +9,9 @@ export abstract class IssuesApiService {
   abstract getIssues$(): Observable<Issue[]>;
   abstract getRefreshInProgress$(): Observable<boolean>;
   abstract getRefreshedDate$(): Observable<Date | undefined>;
-  abstract addIssue(newIssue: NewIssue): Observable<void>;
-  abstract deleteIssue(id: string): Observable<void>;
-  abstract refreshIssues(): Observable<void>;
+  abstract addIssue(newIssue: NewIssue): Observable<string>;
+  abstract deleteIssue(id: string): Observable<string>;
+  abstract refreshIssues(): Observable<string>;
   abstract tryIssue(newIssue: NewIssue): Observable<Issue>;
 }
 
@@ -19,8 +19,8 @@ export abstract class ProjectsApiService {
   abstract getProjects$(): Observable<Project[]>;
   abstract getRefreshInProgress$(): Observable<boolean>;
   abstract getRefreshedDate$(): Observable<Date | undefined>;
-  abstract addProject(newProject: NewProject): Observable<void>;
-  abstract deleteProject(id: string): Observable<void>;
-  abstract refreshProjects(): Observable<void>;
+  abstract addProject(newProject: NewProject): Observable<string>;
+  abstract deleteProject(id: string): Observable<string>;
+  abstract refreshProjects(): Observable<string>;
   abstract tryProject(newProject: NewProject): Observable<Project>;
 }

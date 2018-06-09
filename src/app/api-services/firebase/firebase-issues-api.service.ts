@@ -58,23 +58,23 @@ export class FirebaseIssuesApiService implements IssuesApiService {
     );
   }
 
-  addIssue(newIssue: NewIssue): Observable<void> {
+  addIssue(newIssue: NewIssue): Observable<string> {
     return this.http.post<ApiResult>(`${this.api}/issues/add`, newIssue).pipe(
-      map(response => undefined),
+      map(response => response.result),
       catchError(parseApiError),
     );
   }
 
-  deleteIssue(id: string): Observable<void> {
+  deleteIssue(id: string): Observable<string> {
     return this.http.delete<ApiResult>(`${this.api}/issues/delete/${id}`).pipe(
-      map(response => undefined),
+      map(response => response.result),
       catchError(parseApiError),
     );
   }
 
-  refreshIssues(): Observable<void> {
+  refreshIssues(): Observable<string> {
     return this.http.put<ApiResult>(`${this.api}/issues/refresh`, {}).pipe(
-      map(response => undefined),
+      map(response => response.result),
       catchError(parseApiError),
     );
   }

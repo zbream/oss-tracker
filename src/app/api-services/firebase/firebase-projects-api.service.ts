@@ -57,23 +57,23 @@ export class FirebaseProjectsApiService implements ProjectsApiService {
     );
   }
 
-  addProject(newProject: NewProject): Observable<void> {
+  addProject(newProject: NewProject): Observable<string> {
     return this.http.post<ApiResult>(`${this.api}/projects/add`, newProject).pipe(
-      map(response => undefined),
+      map(response => response.result),
       catchError(parseApiError),
     );
   }
 
-  deleteProject(id: string): Observable<void> {
+  deleteProject(id: string): Observable<string> {
     return this.http.delete<ApiResult>(`${this.api}/projects/delete/${id}`).pipe(
-      map(response => undefined),
+      map(response => response.result),
       catchError(parseApiError),
     );
   }
 
-  refreshProjects(): Observable<void> {
+  refreshProjects(): Observable<string> {
     return this.http.put<ApiResult>(`${this.api}/projects/refresh`, {}).pipe(
-      map(response => undefined),
+      map(response => response.result),
       catchError(parseApiError),
     );
   }

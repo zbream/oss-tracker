@@ -1,10 +1,11 @@
 import { Component, OnInit, TrackByFunction } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { combineLatest, Observable } from 'rxjs';
-import { debounceTime, map, startWith } from 'rxjs/operators';
+import { combineLatest, Observable, of } from 'rxjs';
+import { debounceTime, map, startWith, switchMap } from 'rxjs/operators';
 
 import { IssuesApiService } from '../../api-services/interfaces';
 import { Issue } from '../../models/issue';
+import { IssuesDialogService } from './services/issues-dialog.service';
 import { IssuesFilterFn } from './utils/issues-filter';
 
 @Component({
@@ -22,6 +23,7 @@ export class IssuesView implements OnInit {
 
   constructor(
     private issuesApi: IssuesApiService,
+    private issuesDialog: IssuesDialogService,
   ) {
     this._filterFormControl = new FormControl('');
 
@@ -35,9 +37,9 @@ export class IssuesView implements OnInit {
       issues$,
       filter$,
     ).pipe(
-      map(([issues, filter]) => {
-        if (filter) {
-          return issues.filter(IssuesFilterFn(filter));
+      map(([issues, filterString]) => {
+        if (filterString) {
+          return issues.filter(IssuesFilterFn(filterString));
         } else {
           return issues;
         }
@@ -55,10 +57,22 @@ export class IssuesView implements OnInit {
   }
 
   _onAdd() {
-    this.issuesApi.addIssue({ projectName: 'ReactiveX/rxjs', issueNumber: 2900 }).subscribe({
-      next: () => console.log('Added successfully'),
-      error: err => console.error(err),
+    this.issuesDialog.showAddDialog$().pipe(
+      switchMap(newIssue => newIssue ? this.issuesApi.addIssue(newIssue) : of(undefined)),
+    ).subscribe({
+      next: result => {
+        if (result !== undefined) {
+          console.log(result);
+        }
+      },
+      error: err => {
+        console.error(err);
+      },
     });
+    // this.issuesApi.addIssue({ projectName: 'ReactiveX/rxjs', issueNumber: 2900 }).subscribe({
+    //   next: () => console.log('Added successfully'),
+    //   error: err => console.error(err),
+    // });
   }
 
   readonly _trackByFn: TrackByFunction<Issue> = (index, item) => item.id;

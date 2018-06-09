@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, map, tap } from 'rxjs/operators';
+import { delay, map, switchMap, tap } from 'rxjs/operators';
 
 import { Issue, NewIssue } from '../../models/issue';
 import { IssuesApiService } from '../interfaces';
@@ -15,14 +15,14 @@ const INIT_ISSUES: Issue[] = [
 
 const INIT_REFRESH_IN_PROGRESS = false;
 
-const INIT_REFRESHED: Date | undefined = new Date(2017, 7, 21, 1, 23, 45);
+const INIT_REFRESHED_DATE: Date | undefined = new Date(2017, 7, 21, 1, 23, 45);
 
 @Injectable()
 export class MockIssuesApiService implements IssuesApiService {
 
   private _issuesSubject = new BehaviorSubject(INIT_ISSUES);
   private _refreshInProgressSubject = new BehaviorSubject(INIT_REFRESH_IN_PROGRESS);
-  private _refreshedSubject = new BehaviorSubject(INIT_REFRESHED);
+  private _refreshedDateSubject = new BehaviorSubject(INIT_REFRESHED_DATE);
 
   getIssues$(): Observable<Issue[]> {
     return this._issuesSubject.asObservable().pipe(
@@ -35,11 +35,11 @@ export class MockIssuesApiService implements IssuesApiService {
   }
 
   getRefreshedDate$(): Observable<Date | undefined> {
-    return this._refreshedSubject.asObservable();
+    return this._refreshedDateSubject.asObservable();
   }
 
-  addIssue(newIssue: NewIssue): Observable<void> {
-    return of(undefined).pipe(
+  addIssue(newIssue: NewIssue): Observable<string> {
+    return of('Issue added successfully.').pipe(
       delay(DELAY),
       tap(() => {
 
@@ -63,8 +63,8 @@ export class MockIssuesApiService implements IssuesApiService {
     );
   }
 
-  deleteIssue(id: string): Observable<void> {
-    return of(undefined).pipe(
+  deleteIssue(id: string): Observable<string> {
+    return of('Issue deleted successfully.').pipe(
       delay(DELAY),
       tap(() => {
 
@@ -83,16 +83,24 @@ export class MockIssuesApiService implements IssuesApiService {
     );
   }
 
-  refreshIssues(): Observable<void> {
+  refreshIssues(): Observable<string> {
     return of(undefined).pipe(
       delay(DELAY),
-      tap(() => {
-        this._refreshInProgressSubject.next(true);
-        this._refreshedSubject.next(new Date(Date.now()));
-      }),
-      delay(DELAY * 5),
-      tap(() => {
-        this._refreshInProgressSubject.next(false);
+      switchMap(() => {
+        if (this._refreshInProgressSubject.value) {
+          return of('A refresh is in progress.');
+        } else {
+          return of('Issues refreshed.').pipe(
+            tap(() => {
+              this._refreshInProgressSubject.next(true);
+              this._refreshedDateSubject.next(new Date(Date.now()));
+            }),
+            delay(DELAY * 5),
+            tap(() => {
+              this._refreshInProgressSubject.next(false);
+            }),
+          );
+        }
       }),
       delay(DELAY),
     );

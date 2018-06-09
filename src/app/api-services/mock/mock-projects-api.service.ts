@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, map, tap } from 'rxjs/operators';
+import { delay, map, switchMap, tap } from 'rxjs/operators';
 
 import { NewProject, Project } from '../../models/project';
 import { ProjectsApiService } from '../interfaces';
@@ -38,8 +38,8 @@ export class MockProjectsApiService implements ProjectsApiService {
     return this._refreshedDateSubject.asObservable();
   }
 
-  addProject(newProject: NewProject): Observable<void> {
-    return of(undefined).pipe(
+  addProject(newProject: NewProject): Observable<string> {
+    return of('Project added successfully.').pipe(
       delay(DELAY),
       tap(() => {
 
@@ -63,8 +63,8 @@ export class MockProjectsApiService implements ProjectsApiService {
     );
   }
 
-  deleteProject(id: string): Observable<void> {
-    return of(undefined).pipe(
+  deleteProject(id: string): Observable<string> {
+    return of('Project deleted successfully.').pipe(
       delay(DELAY),
       tap(() => {
 
@@ -83,16 +83,24 @@ export class MockProjectsApiService implements ProjectsApiService {
     );
   }
 
-  refreshProjects(): Observable<void> {
+  refreshProjects(): Observable<string> {
     return of(undefined).pipe(
       delay(DELAY),
-      tap(() => {
-        this._refreshInProgressSubject.next(true);
-        this._refreshedDateSubject.next(new Date(Date.now()));
-      }),
-      delay(DELAY * 5),
-      tap(() => {
-        this._refreshInProgressSubject.next(false);
+      switchMap(() => {
+        if (this._refreshInProgressSubject.value) {
+          return of('A refresh is in progress.');
+        } else {
+          return of('Projects refreshed.').pipe(
+            tap(() => {
+              this._refreshInProgressSubject.next(true);
+              this._refreshedDateSubject.next(new Date(Date.now()));
+            }),
+            delay(DELAY * 5),
+            tap(() => {
+              this._refreshInProgressSubject.next(false);
+            }),
+          );
+        }
       }),
       delay(DELAY),
     );

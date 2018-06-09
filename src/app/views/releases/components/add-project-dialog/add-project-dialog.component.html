@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>Add Project on NPM</h2>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <div class="input-row">
+      <mat-form-field floatLabel="always" fxFlex>
+        <mat-label>Package Name</mat-label>
+        <input matInput formControlName="name" [placeholder]="placeholder.name">
+        <mat-error>Package Name is <strong>required</strong></mat-error>
+      </mat-form-field>
+    </div>
+    <div class="input-row">
+      <mat-form-field floatLabel="always" fxFlex>
+        <mat-label>Link to Project</mat-label>
+        <input matInput formControlName="linkUrl" [placeholder]="placeholder.linkUrl">
+        <mat-error>Project URL is <strong>required</strong></mat-error>
+      </mat-form-field>
+    </div>
+    <div class="input-row">
+      <mat-form-field floatLabel="always" fxFlex>
+        <mat-label>Link to Changelog</mat-label>
+        <input matInput formControlName="linkChangelog" [placeholder]="placeholder.linkChangelog">
+        <mat-error>Changelog URL is <strong>required</strong></mat-error>
+      </mat-form-field>
+    </div>
+    <div fxLayoutGap="20px" class="input-row">
+      <mat-form-field floatLabel="always" fxFlex>
+        <mat-label>Latest dist-tag</mat-label>
+        <input matInput placeholder="latest" value="latest" readonly>
+      </mat-form-field>
+      <mat-form-field floatLabel="always" fxFlex>
+        <mat-label>Next/Beta dist-tag</mat-label>
+        <input matInput formControlName="next" [placeholder]="placeholder.next">
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions fxLayoutAlign="end">
+    <button mat-button [mat-dialog-close]="undefined">CANCEL</button>
+    <button mat-raised-button color="primary" type="submit">ADD</button>
+  </mat-dialog-actions>
+</form>
