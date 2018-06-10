@@ -9,6 +9,8 @@ import { IssuesController, ProjectsController } from './controllers';
 import {
   IssueDbService,
   IssueRetrieverService,
+  HttpIssueRetrieverService,
+  HttpProjectRetrieverService,
   IssueUpdaterService,
   ProjectDbService,
   ProjectRetrieverService,
@@ -28,10 +30,12 @@ const firestore = admin.firestore();
 
 // initialize services
 const issueDb: IssueDbService = new IssueDbService(firestore);
-const issueRetriever: IssueRetrieverService = new MockIssueRetrieverService();
+const issueRetriever: IssueRetrieverService = new HttpIssueRetrieverService();
+// const issueRetriever: IssueRetrieverService = new MockIssueRetrieverService();
 const issueUpdater: IssueUpdaterService = new IssueUpdaterService(issueDb, issueRetriever);
 const projectDb: ProjectDbService = new ProjectDbService(firestore);
-const projectRetriever: ProjectRetrieverService = new MockProjectRetrieverService();
+const projectRetriever: ProjectRetrieverService = new HttpProjectRetrieverService();
+// const projectRetriever: ProjectRetrieverService = new MockProjectRetrieverService();
 const projectUpdater: ProjectUpdaterService = new ProjectUpdaterService(projectDb, projectRetriever);
 
 // initialize controllers
