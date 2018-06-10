@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { AngularFirestore } from 'angularfire2/firestore';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+
+import { Timestamp } from '@firebase/firestore-types';
+import { AngularFirestore } from 'angularfire2/firestore';
 
 import { NewProject, Project } from '../../models/project';
 import { ProjectsApiService } from '../interfaces';
@@ -15,15 +17,15 @@ interface ApiProject {
   linkChangelog: string;
   data: {
     latestVersion: string;
-    latestDate: Date;
+    latestDate: Timestamp;
     nextVersion?: string;
-    nextDate?: Date;
+    nextDate?: Timestamp;
   };
 }
 
 interface ApiProjectState {
   refreshInProgress: boolean;
-  refreshed?: Date;
+  refreshed?: Timestamp;
 }
 
 @Injectable()
@@ -53,7 +55,7 @@ export class FirebaseProjectsApiService implements ProjectsApiService {
 
   getRefreshedDate$(): Observable<Date | undefined> {
     return this.firestore.doc<ApiProjectState>('state/projects').valueChanges().pipe(
-      map(state => state ? state.refreshed : undefined),
+      map(state => (state && state.refreshed) ? state.refreshed.toDate() : undefined),
     );
   }
 
@@ -95,11 +97,11 @@ export class FirebaseProjectsApiService implements ProjectsApiService {
       },
       latest: {
         version: apiProject.data.latestVersion,
-        date: apiProject.data.latestDate,
+        date: apiProject.data.latestDate.toDate(),
       },
       next: apiProject.data.nextVersion ? {
         version: apiProject.data.nextVersion!,
-        date: apiProject.data.nextDate!,
+        date: apiProject.data.nextDate!.toDate(),
       } : undefined,
     };
   }

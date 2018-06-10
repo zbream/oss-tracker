@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { AngularFirestore } from 'angularfire2/firestore';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+
+import { Timestamp } from '@firebase/firestore-types';
+import { AngularFirestore } from 'angularfire2/firestore';
 
 import { Issue, NewIssue } from '../../models/issue';
 import { IssuesApiService } from '../interfaces';
@@ -15,8 +17,8 @@ interface ApiIssue {
   data: {
     issueDescription: string;
     status: string;
-    closedDate?: Date;
-    latestActivityDate: Date;
+    closedDate?: Timestamp;
+    latestActivityDate: Timestamp;
     linkProject: string;
     linkIssue: string;
   };
@@ -24,7 +26,7 @@ interface ApiIssue {
 
 interface ApiIssueState {
   refreshInProgress: boolean;
-  refreshed?: Date;
+  refreshed?: Timestamp;
 }
 
 @Injectable()
@@ -54,7 +56,7 @@ export class FirebaseIssuesApiService implements IssuesApiService {
 
   getRefreshedDate$(): Observable<Date | undefined> {
     return this.firestore.doc<ApiIssueState>('state/issues').valueChanges().pipe(
-      map(state => state ? state.refreshed : undefined),
+      map(state => (state && state.refreshed) ? state.refreshed.toDate() : undefined),
     );
   }
 
@@ -93,8 +95,8 @@ export class FirebaseIssuesApiService implements IssuesApiService {
       issue: apiIssue.issueNumber,
       description: apiIssue.data.issueDescription,
       status: apiIssue.data.status,
-      closedDate: apiIssue.data.closedDate,
-      latestActivityDate: apiIssue.data.latestActivityDate,
+      closedDate: apiIssue.data.closedDate ? apiIssue.data.closedDate.toDate() : undefined,
+      latestActivityDate: apiIssue.data.latestActivityDate.toDate(),
       links: {
         project: apiIssue.data.linkProject,
         issue: apiIssue.data.linkIssue,
