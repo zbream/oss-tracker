@@ -1,0 +1,12 @@
+.issues-table {
+  // override the default, it's too big
+  box-shadow: none !important;
+}
+
+.issues-table ::ng-deep .datatable-header-cell.sort-active {
+  text-decoration: underline;
+}
+
+.issues-table ::ng-deep .issues-table__row {
+  cursor: pointer;
+}

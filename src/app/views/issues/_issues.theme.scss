@@ -3,6 +3,7 @@
 @mixin issues-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
+  $background: map-get($theme, background);
 
   .issues-header {
     @include mat-elevation(1);
@@ -11,4 +12,35 @@
     border-bottom: 1px solid mat-color($primary, darker);
   }
 
+  .issues-content__table {
+    @include mat-elevation(1);
+
+    z-index: 1;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  $status-green: mat-palette($mat-green);
+  $status-red: mat-palette($mat-red);
+  $status-opacity-background: 0.1;
+
+  $status-open-background: mat-color($status-green, $status-opacity-background);
+  $status-closed-background: mat-color($status-red, $status-opacity-background);
+  $status-open-icon: mat-color($status-green);
+  $status-closed-icon: mat-color($status-red);
+
+  .issues-table .issues-table__row--open {
+    background-color: $status-open-background;
+
+    & .issues-table__icon {
+      color: $status-open-icon;
+    }
+  }
+
+  .issues-table .issues-table__row--closed {
+    background-color: $status-closed-background;
+
+    & .issues-table__icon {
+      color: $status-closed-icon;
+    }
+  }
 }

@@ -1,0 +1,33 @@
+<ngx-datatable class="material projects-table"
+  (activate)="_onActivate($event)"
+  columnMode="force"
+  [headerHeight]="50"
+  [reorderable]="false"
+  [rowClass]="_rowClass"
+  rowHeight="auto"
+  [rows]="projects || []"
+  [scrollbarH]="true"
+  [sorts]="_defaultSort"
+  trackByProp="id"
+  >
+  <ngx-datatable-column name="Project" prop="name" [minWidth]="200">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      <div class="mat-body-2">{{ row.name }}</div>
+      <a [href]="row.links.url" target="_blank">{{ row.links.url }}</a>
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Latest" prop="latest" [minWidth]="150" [width]="150" [canAutoResize]="false" [comparator]="_comparatorLatestColumn">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      <div class="mat-body-2">{{ row.latest.version }}</div>
+      <div>{{ row.latest.date | date:'MMM d, y' }}</div>
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Pre-Release" prop="next" [minWidth]="150" [width]="150" [canAutoResize]="false" [comparator]="_comparatorNextColumn">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      <ng-container *ngIf="row.next">
+        <div class="mat-body-2">{{ row.next.version }}</div>
+        <div>{{ row.next.date | date:'MMM d, y' }}</div>
+      </ng-container>
+    </ng-template>
+  </ngx-datatable-column>
+</ngx-datatable>

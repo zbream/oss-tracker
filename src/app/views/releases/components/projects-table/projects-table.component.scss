@@ -1,0 +1,12 @@
+.projects-table {
+  // override the default, it's too big
+  box-shadow: none !important;
+}
+
+.projects-table ::ng-deep .datatable-header-cell.sort-active {
+  text-decoration: underline;
+}
+
+.projects-table ::ng-deep .projects-table__row {
+  cursor: pointer;
+}

@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { SharedModule } from '../../shared/shared.module';
 import { AddIssueDialogComponent } from './components/add-issue-dialog/add-issue-dialog.component';
+import { IssuesTableComponent } from './components/issues-table/issues-table.component';
 import { IssuesView } from './issues.view';
 import { IssuesDialogService } from './services/issues-dialog.service';
 
@@ -16,6 +17,7 @@ const ROUTES: Routes = [
 @NgModule({
   declarations: [
     IssuesView,
+    IssuesTableComponent,
     AddIssueDialogComponent,
   ],
   imports: [

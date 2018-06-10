@@ -11,10 +11,18 @@
 
   <div class="releases-content" fxFlex="grow">
     <div class="releases-content__container">
+      <div class="releases-content__table">
+        <oss-projects-table [projects]="_filteredProjects$ | async"></oss-projects-table>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="releases-content" fxFlex="grow">
+    <div class="releases-content__container">
       <ng-container *ngFor="let project of _filteredProjects$ | async; trackBy: _trackByFn">
         <div>{{ project | json }}</div>
       </ng-container>
     </div>
-  </div>
+  </div> -->
 
 </div>

@@ -11,10 +11,18 @@
 
   <div class="issues-content" fxFlex="grow">
     <div class="issues-content__container">
+      <div class="issues-content__table">
+        <oss-issues-table [issues]="_filteredIssues$ | async"></oss-issues-table>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="issues-content" fxFlex="grow">
+    <div class="issues-content__container">
       <ng-container *ngFor="let issue of _filteredIssues$ | async; trackBy: _trackByFn">
         <div>{{ issue | json }}</div>
       </ng-container>
     </div>
-  </div>
+  </div> -->
 
 </div>
