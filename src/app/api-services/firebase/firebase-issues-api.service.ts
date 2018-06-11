@@ -3,13 +3,14 @@ import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { Timestamp } from '@firebase/firestore-types';
 import { AngularFirestore } from 'angularfire2/firestore';
+import { firestore } from 'firebase/app';
 
 import { Issue, NewIssue } from '../../models/issue';
 import { IssuesApiService } from '../interfaces';
 import { ApiResult, parseApiError } from './firebase-api-responses';
 import { FIREBASE_API } from './firebase-api.token';
+import { parseFirebaseDate } from './firebase-utils';
 
 interface ApiIssue {
   projectName: string;
@@ -17,8 +18,8 @@ interface ApiIssue {
   data: {
     issueDescription: string;
     status: string;
-    closedDate?: Timestamp;
-    latestActivityDate: Timestamp;
+    closedDate?: firestore.Timestamp | string;
+    latestActivityDate: firestore.Timestamp | string;
     linkProject: string;
     linkIssue: string;
   };
@@ -26,7 +27,7 @@ interface ApiIssue {
 
 interface ApiIssueState {
   refreshInProgress: boolean;
-  refreshed?: Timestamp;
+  refreshed?: firestore.Timestamp;
 }
 
 @Injectable()
@@ -35,11 +36,11 @@ export class FirebaseIssuesApiService implements IssuesApiService {
   constructor(
     @Inject(FIREBASE_API) private api: string,
     private http: HttpClient,
-    private firestore: AngularFirestore,
+    private ngFirestore: AngularFirestore,
   ) {}
 
   getIssues$(): Observable<Issue[]> {
-    return this.firestore.collection<ApiIssue>('issues').snapshotChanges().pipe(
+    return this.ngFirestore.collection<ApiIssue>('issues').snapshotChanges().pipe(
       map(actions => actions.map(action => {
         const id = action.payload.doc.id;
         const issue = action.payload.doc.data() as ApiIssue;
@@ -49,14 +50,14 @@ export class FirebaseIssuesApiService implements IssuesApiService {
   }
 
   getRefreshInProgress$(): Observable<boolean> {
-    return this.firestore.doc<ApiIssueState>('state/issues').valueChanges().pipe(
+    return this.ngFirestore.doc<ApiIssueState>('state/issues').valueChanges().pipe(
       map(state => state ? state.refreshInProgress : false),
     );
   }
 
   getRefreshedDate$(): Observable<Date | undefined> {
-    return this.firestore.doc<ApiIssueState>('state/issues').valueChanges().pipe(
-      map(state => (state && state.refreshed) ? state.refreshed.toDate() : undefined),
+    return this.ngFirestore.doc<ApiIssueState>('state/issues').valueChanges().pipe(
+      map(state => (state && state.refreshed) ? parseFirebaseDate(state.refreshed) : undefined),
     );
   }
 
@@ -95,12 +96,13 @@ export class FirebaseIssuesApiService implements IssuesApiService {
       issue: apiIssue.issueNumber,
       description: apiIssue.data.issueDescription,
       status: apiIssue.data.status,
-      closedDate: apiIssue.data.closedDate ? apiIssue.data.closedDate.toDate() : undefined,
-      latestActivityDate: apiIssue.data.latestActivityDate.toDate(),
+      closedDate: apiIssue.data.closedDate ? parseFirebaseDate(apiIssue.data.closedDate) : undefined,
+      latestActivityDate: parseFirebaseDate(apiIssue.data.latestActivityDate),
       links: {
         project: apiIssue.data.linkProject,
         issue: apiIssue.data.linkIssue,
       },
     };
   }
+
 }

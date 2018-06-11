@@ -26,7 +26,7 @@ export class ProjectsTableComponent implements OnInit {
   _onActivate(event: any) {
     if (event.type === 'click') {
       const project: Project = event.row;
-      console.log(project);
+      window.open(project.links.changelog, '_blank');
     }
   }
 

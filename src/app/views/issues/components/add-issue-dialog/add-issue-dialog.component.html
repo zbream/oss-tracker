@@ -3,18 +3,41 @@
   <mat-dialog-content>
     <div class="input-row">
       <mat-form-field floatLabel="always" fxFlex>
-        <mat-label>Project Name</mat-label>
-        <input matInput formControlName="projectName" [placeholder]="placeholder.projectName">
-        <mat-error>Project Name is <strong>required</strong></mat-error>
+        <mat-label>Issue URL</mat-label>
+        <input matInput formControlName="url" [placeholder]="placeholder.url">
+        <mat-error>A <strong>valid</strong> GitHub URL is <strong>required</strong></mat-error>
       </mat-form-field>
     </div>
-    <div class="input-row">
-      <mat-form-field floatLabel="always" fxFlex>
-        <mat-label>Issue Number</mat-label>
-        <input matInput formControlName="issueNumber" [placeholder]="placeholder.issueNumber">
-        <mat-error>Issue Number is <strong>required</strong></mat-error>
-      </mat-form-field>
-    </div>
+    <ng-container *ngIf="newIssue$ | async as newIssue">
+      <div fxLayoutGap="20px">
+        <mat-form-field floatLabel="always" fxFlex>
+          <mat-label>Project Name</mat-label>
+          <input matInput [value]="newIssue.projectName" disabled>
+        </mat-form-field>
+        <mat-form-field floatLabel="always" fxFlex>
+          <mat-label>Issue Number</mat-label>
+          <input matInput [value]="newIssue.issueNumber" disabled>
+        </mat-form-field>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="issue$ | async as issue">
+      <div>
+        <mat-form-field floatLabel="always" fxFlex>
+          <mat-label>Issue Description</mat-label>
+          <textarea matInput matTextareaAutosize [value]="issue.description" disabled></textarea>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field floatLabel="always" fxFlex>
+          <mat-label>Status</mat-label>
+          <input matInput [value]="issue.status" disabled>
+        </mat-form-field>
+        <mat-form-field floatLabel="always" fxFlex>
+          <mat-label>Latest Activity</mat-label>
+          <input matInput [value]="issue.latestActivityDate | date:'MMM d, y, h:mm a'" disabled>
+        </mat-form-field>
+      </div>
+    </ng-container>
   </mat-dialog-content>
   <mat-dialog-actions fxLayoutAlign="end">
     <button mat-button [mat-dialog-close]="undefined">CANCEL</button>

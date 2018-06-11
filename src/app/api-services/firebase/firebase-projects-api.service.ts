@@ -3,13 +3,14 @@ import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { Timestamp } from '@firebase/firestore-types';
 import { AngularFirestore } from 'angularfire2/firestore';
+import { firestore } from 'firebase/app';
 
 import { NewProject, Project } from '../../models/project';
 import { ProjectsApiService } from '../interfaces';
 import { ApiResult, parseApiError } from './firebase-api-responses';
 import { FIREBASE_API } from './firebase-api.token';
+import { parseFirebaseDate } from './firebase-utils';
 
 interface ApiProject {
   name: string;
@@ -17,15 +18,15 @@ interface ApiProject {
   linkChangelog: string;
   data: {
     latestVersion: string;
-    latestDate: Timestamp;
+    latestDate: firestore.Timestamp | string;
     nextVersion?: string;
-    nextDate?: Timestamp;
+    nextDate?: firestore.Timestamp | string;
   };
 }
 
 interface ApiProjectState {
   refreshInProgress: boolean;
-  refreshed?: Timestamp;
+  refreshed?: firestore.Timestamp | string;
 }
 
 @Injectable()
@@ -34,11 +35,11 @@ export class FirebaseProjectsApiService implements ProjectsApiService {
   constructor(
     @Inject(FIREBASE_API) private api: string,
     private http: HttpClient,
-    private firestore: AngularFirestore,
+    private ngFirestore: AngularFirestore,
   ) {}
 
   getProjects$(): Observable<Project[]> {
-    return this.firestore.collection<ApiProject>('projects').snapshotChanges().pipe(
+    return this.ngFirestore.collection<ApiProject>('projects').snapshotChanges().pipe(
       map(actions => actions.map(action => {
         const id = action.payload.doc.id;
         const project = action.payload.doc.data() as ApiProject;
@@ -48,14 +49,14 @@ export class FirebaseProjectsApiService implements ProjectsApiService {
   }
 
   getRefreshInProgress$(): Observable<boolean> {
-    return this.firestore.doc<ApiProjectState>('state/projects').valueChanges().pipe(
+    return this.ngFirestore.doc<ApiProjectState>('state/projects').valueChanges().pipe(
       map(state => state ? state.refreshInProgress : false),
     );
   }
 
   getRefreshedDate$(): Observable<Date | undefined> {
-    return this.firestore.doc<ApiProjectState>('state/projects').valueChanges().pipe(
-      map(state => (state && state.refreshed) ? state.refreshed.toDate() : undefined),
+    return this.ngFirestore.doc<ApiProjectState>('state/projects').valueChanges().pipe(
+      map(state => (state && state.refreshed) ? parseFirebaseDate(state.refreshed) : undefined),
     );
   }
 
@@ -97,11 +98,11 @@ export class FirebaseProjectsApiService implements ProjectsApiService {
       },
       latest: {
         version: apiProject.data.latestVersion,
-        date: apiProject.data.latestDate.toDate(),
+        date: parseFirebaseDate(apiProject.data.latestDate),
       },
       next: apiProject.data.nextVersion ? {
         version: apiProject.data.nextVersion!,
-        date: apiProject.data.nextDate!.toDate(),
+        date: parseFirebaseDate(apiProject.data.nextDate!),
       } : undefined,
     };
   }
