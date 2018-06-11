@@ -22,11 +22,11 @@
     "rewrites": [
       {
         "source": "/api",
-        "function": "apiDev"
+        "function": "api"
       },
       {
         "source": "/api/**",
-        "function": "apiDev"
+        "function": "api"
       },
       {
         "source": "**",

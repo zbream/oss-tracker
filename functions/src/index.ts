@@ -50,7 +50,7 @@ app.get('/', (req, res) => void res.status(200).json({ message: 'API works!' }))
 app.use('/issues', issuesController.handler);
 app.use('/projects', projectsController.handler);
 
-export const apiDev = functions.https.onRequest(app);
+export const api = functions.https.onRequest(app);
 
 export const helloWorld = functions.https.onRequest((request, response) => {
   response.send("Hello from Firebase!");

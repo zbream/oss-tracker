@@ -10,8 +10,8 @@ import { FIREBASE_API } from './firebase-api.token';
 import { FirebaseIssuesApiService } from './firebase-issues-api.service';
 import { FirebaseProjectsApiService } from './firebase-projects-api.service';
 
-const API = 'https://us-central1-oss-tracker-53e81.cloudfunctions.net/apiDev';
-// const API = 'http://localhost:5000/oss-tracker-53e81/us-central1/apiDev';
+const API = 'https://us-central1-oss-tracker-53e81.cloudfunctions.net/api';
+// const API = 'http://localhost:5000/oss-tracker-53e81/us-central1/api';
 
 const FIREBASE_OPTIONS: FirebaseOptions = {
   apiKey: 'AIzaSyDsx_yuwiINtdyUbijJlORSpVeUS4Zk-30',
