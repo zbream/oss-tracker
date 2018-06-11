@@ -10,3 +10,11 @@
 .projects-table ::ng-deep .projects-table__row {
   cursor: pointer;
 }
+
+a:hover,
+a:visited,
+a:link,
+a:active {
+  color: blue;
+  text-decoration: none;
+}

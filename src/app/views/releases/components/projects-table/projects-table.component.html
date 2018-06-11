@@ -13,7 +13,7 @@
   <ngx-datatable-column name="Project" prop="name" [minWidth]="200">
     <ng-template let-row="row" ngx-datatable-cell-template>
       <div class="mat-body-2">{{ row.name }}</div>
-      <a [href]="row.links.url" target="_blank">{{ row.links.url }}</a>
+      <a [href]="row.links.url" target="_blank" (click)="$event.stopPropagation()">{{ row.links.url }}</a>
     </ng-template>
   </ngx-datatable-column>
   <ngx-datatable-column name="Latest" prop="latest" [minWidth]="150" [width]="150" [canAutoResize]="false" [comparator]="_comparatorLatestColumn">
