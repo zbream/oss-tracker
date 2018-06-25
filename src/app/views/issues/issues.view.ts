@@ -1,7 +1,7 @@
 import { Component, OnInit, TrackByFunction } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { combineLatest, Observable, of } from 'rxjs';
-import { debounceTime, map, startWith, switchMap } from 'rxjs/operators';
+import { combineLatest, Observable } from 'rxjs';
+import { debounceTime, map, startWith } from 'rxjs/operators';
 
 import { IssuesApiService } from '../../api-services/interfaces';
 import { Issue } from '../../models/issue';
@@ -57,18 +57,7 @@ export class IssuesView implements OnInit {
   }
 
   _onAdd() {
-    this.issuesDialog.showAddDialog$().pipe(
-      switchMap(newIssue => newIssue ? this.issuesApi.addIssue(newIssue) : of(undefined)),
-    ).subscribe({
-      next: result => {
-        if (result !== undefined) {
-          console.log(result);
-        }
-      },
-      error: err => {
-        console.error(err);
-      },
-    });
+    this.issuesDialog.showAddDialog$().subscribe();
     // this.issuesApi.addIssue({ projectName: 'ReactiveX/rxjs', issueNumber: 2900 }).subscribe({
     //   next: () => console.log('Added successfully'),
     //   error: err => console.error(err),

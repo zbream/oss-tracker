@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { MatDialogRef } from '@angular/material';
 
-import { NewProject } from '../../../../models/project';
+import { AddProjectDialogService } from './add-project-dialog.service';
 
 @Component({
   selector: 'oss-add-project-dialog',
   templateUrl: './add-project-dialog.component.html',
   styleUrls: ['./add-project-dialog.component.scss'],
+  providers: [
+    AddProjectDialogService,
+  ],
 })
 export class AddProjectDialogComponent implements OnInit {
 
@@ -22,27 +25,26 @@ export class AddProjectDialogComponent implements OnInit {
 
   constructor(
     private dialogRef: MatDialogRef<AddProjectDialogComponent>,
+    private addService: AddProjectDialogService,
   ) {
-    this.form = new FormGroup({
-      name: new FormControl('', Validators.required),
-      next: new FormControl(''),
-      linkUrl: new FormControl('', Validators.required),
-      linkChangelog: new FormControl('', Validators.required),
+    this.form = this.addService.form;
+    this.dialogRef.beforeClose().subscribe(() => {
+      this.addService.cancel();
     });
   }
 
   ngOnInit() { }
 
   onSubmit() {
-    if (this.form.valid) {
-      const newProject: NewProject = {
-        name: this.form.value.name,
-        nextTag: this.form.value.next || undefined ,
-        linkUrl: this.form.value.linkUrl,
-        linkChangelog: this.form.value.linkChangelog,
-      };
-      this.dialogRef.close(newProject);
-    }
+    this.addService.add();
+  }
+
+  onClose() {
+    this.dialogRef.close();
+  }
+
+  onClear() {
+    this.form.reset();
   }
 
 }

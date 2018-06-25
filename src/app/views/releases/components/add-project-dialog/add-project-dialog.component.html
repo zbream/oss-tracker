@@ -32,9 +32,14 @@
         <input matInput formControlName="next" [placeholder]="placeholder.next">
       </mat-form-field>
     </div>
+    <ng-container *ngIf="form.disabled">
+      <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
+    </ng-container>
   </mat-dialog-content>
-  <mat-dialog-actions fxLayoutAlign="end">
-    <button mat-button [mat-dialog-close]="undefined">CANCEL</button>
-    <button mat-raised-button color="primary" type="submit">ADD</button>
+  <mat-dialog-actions>
+    <button type="button" mat-button (click)="onClear()" [disabled]="form.disabled">CLEAR</button>
+    <span fxFlex></span>
+    <button type="button" mat-button (click)="onClose()">CLOSE</button>
+    <button type="submit" mat-raised-button color="primary" [disabled]="form.disabled">ADD</button>
   </mat-dialog-actions>
 </form>

@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { MatDialogRef } from '@angular/material';
-import { Observable, of } from 'rxjs';
-import { catchError, debounceTime, map, share, startWith, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
-import { IssuesApiService } from '../../../../api-services/interfaces';
 import { Issue, NewIssue } from '../../../../models/issue';
-
-const URL_REGEX = /^https?:\/\/github\.com\/(.+)\/issues\/([0-9]+)\/?$/;
+import { AddIssueDialogService } from './add-issue-dialog.service';
 
 @Component({
   selector: 'oss-add-issue-dialog',
   templateUrl: './add-issue-dialog.component.html',
   styleUrls: ['./add-issue-dialog.component.scss'],
+  providers: [
+    AddIssueDialogService,
+  ],
 })
 export class AddIssueDialogComponent implements OnInit {
 
@@ -23,60 +23,32 @@ export class AddIssueDialogComponent implements OnInit {
   form: FormGroup;
 
   newIssue$: Observable<NewIssue | undefined>;
-  issue$: Observable<Issue | undefined>;
+  newIssueRetrieved$: Observable<Issue | undefined>;
 
   constructor(
-    private issuesApi: IssuesApiService,
     private dialogRef: MatDialogRef<AddIssueDialogComponent>,
+    private addService: AddIssueDialogService,
   ) {
-    this.form = new FormGroup({
-      url: new  FormControl('', [Validators.required, Validators.pattern(URL_REGEX)]),
+    this.form = this.addService.form;
+    this.newIssue$ = this.addService.newIssue$;
+    this.newIssueRetrieved$ = this.addService.newIssueRetrieved$;
+    this.dialogRef.beforeClose().subscribe(() => {
+      this.addService.cancel();
     });
-
-    // provide a UI preview as URL changes
-    this.newIssue$ = this.form.valueChanges.pipe(
-      debounceTime(300),
-      map(value => this.validateUrl(value.url)),
-      share(),
-    );
-    this.issue$ = this.newIssue$.pipe(
-      switchMap(newIssue => {
-        if (newIssue) {
-          return this.issuesApi.tryIssue(newIssue).pipe(
-            startWith(undefined as any),
-            catchError(() => of(undefined)),
-          );
-        } else {
-          return of(undefined);
-        }
-      }),
-      share(),
-    );
   }
 
   ngOnInit() { }
 
   onSubmit() {
-    if (!this.form.valid) {
-      return;
-    }
-    const newIssue = this.validateUrl(this.form.value.url);
-    if (!newIssue) {
-      return;
-    }
-    this.dialogRef.close(newIssue);
+    this.addService.add();
   }
 
-  private validateUrl(url: string): NewIssue | undefined {
-    const split = URL_REGEX.exec(url);
-    if (split) {
-      return {
-        projectName: split[1],
-        issueNumber: +split[2],
-      };
-    } else {
-      return undefined;
-    }
+  onClose() {
+    this.dialogRef.close();
+  }
+
+  onClear() {
+    this.form.reset();
   }
 
 }

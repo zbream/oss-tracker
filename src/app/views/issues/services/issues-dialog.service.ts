@@ -12,7 +12,7 @@ export class IssuesDialogService {
     private dialog: MatDialog,
   ) {}
 
-  showAddDialog$(): Observable<NewIssue | undefined> {
+  showAddDialog$(): Observable<void> {
     return this.dialog.open(AddIssueDialogComponent, {
       width: '400px',
     }).afterClosed();
