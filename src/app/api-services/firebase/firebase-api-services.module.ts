@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 
 import { FirebaseAppConfig, FirebaseOptions } from '@firebase/app-types';
@@ -38,4 +38,13 @@ const FIREBASE_APP_CONFIG: FirebaseAppConfig = {
     { provide: ProjectsApiService, useClass: FirebaseProjectsApiService },
   ],
 })
-export class FirebaseApiServicesModule {}
+export class FirebaseApiServicesModule {
+
+  constructor(
+    private http: HttpClient,
+  ) {
+    // ping the server, to wake up the function
+    this.http.get(`${API}/`).subscribe();
+  }
+
+}
