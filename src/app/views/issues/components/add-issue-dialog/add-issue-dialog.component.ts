@@ -4,6 +4,7 @@ import { MatDialogRef } from '@angular/material';
 import { Observable } from 'rxjs';
 
 import { Issue, NewIssue } from '../../../../models/issue';
+import { ADD_ISSUE_DIALOG_ANIMATIONS } from './add-issue-dialog.animations';
 import { AddIssueDialogService } from './add-issue-dialog.service';
 
 @Component({
@@ -13,6 +14,7 @@ import { AddIssueDialogService } from './add-issue-dialog.service';
   providers: [
     AddIssueDialogService,
   ],
+  animations: ADD_ISSUE_DIALOG_ANIMATIONS,
 })
 export class AddIssueDialogComponent implements OnInit {
 

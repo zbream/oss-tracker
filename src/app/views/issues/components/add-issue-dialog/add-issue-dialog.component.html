@@ -8,7 +8,7 @@
         <mat-error>A <strong>valid</strong> GitHub URL is <strong>required</strong></mat-error>
       </mat-form-field>
     </div>
-    <ng-container *ngIf="newIssue$ | async as newIssue">
+    <div *ngIf="newIssue$ | async as newIssue" @grow class="grow">
       <div fxLayoutGap="20px">
         <mat-form-field floatLabel="always" fxFlex>
           <mat-label>Project Name</mat-label>
@@ -19,8 +19,8 @@
           <input matInput [value]="newIssue.issueNumber" disabled>
         </mat-form-field>
       </div>
-    </ng-container>
-    <ng-container *ngIf="newIssueRetrieved$ | async as issue">
+    </div>
+    <div *ngIf="newIssueRetrieved$ | async as issue" @grow class="grow">
       <div>
         <mat-form-field floatLabel="always" fxFlex>
           <mat-label>Issue Description</mat-label>
@@ -37,7 +37,7 @@
           <input matInput [value]="issue.latestActivityDate | date:'MMM d, y, h:mm a'" disabled>
         </mat-form-field>
       </div>
-    </ng-container>
+    </div>
     <ng-container *ngIf="form.disabled">
       <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
     </ng-container>
