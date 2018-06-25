@@ -46,7 +46,7 @@ const projectsController = new ProjectsController(projectDb, projectRetriever, p
 const app = express();
 app.use(cors({ origin: true }));
 app.use(fixes.fbHostingRedirectUrlFix('api'));
-app.get('/', (req, res) => void res.status(200).json({ message: 'API works!' }));
+app.get('/', (req, res) => void res.status(200).json({ message: 'PING' }));
 app.use('/issues', issuesController.handler);
 app.use('/projects', projectsController.handler);
 

@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-import { NewProject, ProjectData, Project } from '../../models';
+import { NewProject, ProjectData } from '../../models';
 import { ProjectRetrieverService } from "./interfaces";
 
 const NPM_API_URL = 'https://registry.npmjs.org';

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-const DEFAULT_ROUTE = '/releases';
+const DEFAULT_ROUTE = '/issues';
 
 const ROUTES: Routes = [
   {
@@ -9,12 +9,12 @@ const ROUTES: Routes = [
     redirectTo: DEFAULT_ROUTE,
   },
   {
-    path: 'releases',
-    loadChildren: './views/releases/releases.module#ReleasesModule',
-  },
-  {
     path: 'issues',
     loadChildren: './views/issues/issues.module#IssuesModule',
+  },
+  {
+    path: 'releases',
+    loadChildren: './views/releases/releases.module#ReleasesModule',
   },
   {
     path: '**',

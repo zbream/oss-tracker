@@ -4,7 +4,7 @@
     <div fxHide.xs>
       <mat-toolbar class="app-header-title__toolbar" color="primary">
         <span fxFlex></span>
-        <span>OSS Project & Issue Tracker</span>
+        <span>OSS Issue & Project Tracker</span>
         <span fxFlex fxLayoutAlign="end">
           <a mat-icon-button href="mailto:zack.ream@hyland.com">
             <mat-icon>help</mat-icon>
@@ -14,15 +14,15 @@
     </div>
     <nav mat-tab-nav-bar backgroundColor="primary" color="accent">
       <span fxFlex></span>
-      <a mat-tab-link routerLink="/releases" fxFlex="0 1 400px"
-        routerLinkActive #rActive="routerLinkActive" [active]="rActive.isActive">
-        <mat-icon class="app-header-nav__icon" fxHide.xs>code</mat-icon>
-        <span>Project Releases</span>
-      </a>
       <a mat-tab-link routerLink="/issues" fxFlex="0 1 400px"
         routerLinkActive #iActive="routerLinkActive" [active]="iActive.isActive">
         <mat-icon class="app-header-nav__icon" fxHide.xs>bug_report</mat-icon>
         <span>Tracked Issues</span>
+      </a>
+      <a mat-tab-link routerLink="/releases" fxFlex="0 1 400px"
+        routerLinkActive #rActive="routerLinkActive" [active]="rActive.isActive">
+        <mat-icon class="app-header-nav__icon" fxHide.xs>code</mat-icon>
+        <span>Project Releases</span>
       </a>
       <span fxFlex></span>
     </nav>
