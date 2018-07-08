@@ -1,10 +1,11 @@
 import { Component, OnInit, TrackByFunction } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { combineLatest, Observable, of } from 'rxjs';
-import { debounceTime, map, startWith, switchMap } from 'rxjs/operators';
+import { combineLatest, Observable } from 'rxjs';
+import { debounceTime, map, startWith } from 'rxjs/operators';
 
 import { ProjectsApiService } from '../../api-services/interfaces';
 import { Project } from '../../models/project';
+import { NotificationService } from '../../services/notification.service';
 import { ReleasesDialogService } from './services/releases-dialog.service';
 import { ProjectsFilterFn } from './utils/projects-filter';
 
@@ -24,6 +25,7 @@ export class ReleasesView implements OnInit {
   constructor(
     private projectsApi: ProjectsApiService,
     private releasesDialog: ReleasesDialogService,
+    private notification: NotificationService,
   ) {
     this._filterFormControl = new FormControl('');
 
@@ -53,28 +55,24 @@ export class ReleasesView implements OnInit {
   ngOnInit() { }
 
   _onRefresh() {
-    this.projectsApi.refreshProjects().subscribe();
+    this.projectsApi.refreshProjects().subscribe({
+      next: message => {
+        this.notification.show(message);
+      },
+      error: err => {
+        this.notification.show(err);
+      },
+    });
   }
 
   _onAdd() {
-    this.releasesDialog.showAddDialog$().pipe(
-      switchMap(newProject => newProject ? this.projectsApi.addProject(newProject) : of(undefined)),
-    ).subscribe({
-      next: result => {
-        if (result !== undefined) {
-          console.log(result);
-        }
-      },
-      error: err => {
-        console.error(err);
-      },
-    });
+    this.releasesDialog.showAddDialog$().subscribe();
     // this.projectsApi.addProject({ name: 'rxjs', linkUrl: '', linkChangelog: '' }).subscribe({
     //   next: () => console.log('Added successfully.'),
     //   error: err => console.error(err),
     // });
   }
 
-  readonly _trackByFn: TrackByFunction<Project> = (index, item) => item.id;
+  readonly _trackByFn: TrackByFunction<Project> = (_index, item) => item.id;
 
 }

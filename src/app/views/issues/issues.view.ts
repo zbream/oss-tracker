@@ -5,6 +5,7 @@ import { debounceTime, map, startWith } from 'rxjs/operators';
 
 import { IssuesApiService } from '../../api-services/interfaces';
 import { Issue } from '../../models/issue';
+import { NotificationService } from '../../services/notification.service';
 import { IssuesDialogService } from './services/issues-dialog.service';
 import { IssuesFilterFn } from './utils/issues-filter';
 
@@ -24,6 +25,7 @@ export class IssuesView implements OnInit {
   constructor(
     private issuesApi: IssuesApiService,
     private issuesDialog: IssuesDialogService,
+    private notification: NotificationService,
   ) {
     this._filterFormControl = new FormControl('');
 
@@ -53,7 +55,14 @@ export class IssuesView implements OnInit {
   ngOnInit() { }
 
   _onRefresh() {
-    this.issuesApi.refreshIssues().subscribe();
+    this.issuesApi.refreshIssues().subscribe({
+      next: message => {
+        this.notification.show(message);
+      },
+      error: err => {
+        this.notification.show(err);
+      },
+    });
   }
 
   _onAdd() {
