@@ -7,7 +7,6 @@
 
 @include mat-core();
 @include angular-material-theme($app-theme);
-
 @include app-theme($app-theme);
 @include command-bar-theme($app-theme);
 @include issues-theme($app-theme);

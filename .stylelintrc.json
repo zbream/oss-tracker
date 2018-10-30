@@ -1,4 +1,4 @@
 {
-  "extends": "zream-angular-standards/config/stylelint",
+  "extends": "zbream-standards/config/angular/stylelint",
   "rules": {}
 }

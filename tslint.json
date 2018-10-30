@@ -1,6 +1,6 @@
 {
   "extends": [
-    "zream-angular-standards/config/tslint"
+    "zbream-standards/config/angular/tslint"
   ],
   "rules": {
     "component-selector": {
@@ -17,9 +17,8 @@
         "camelCase"
       ]
     },
-    "pipe-naming": {
+    "pipe-prefix": {
       "options": [
-        "camelCase",
         "oss"
       ]
     }

@@ -1,9 +1,9 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 
+import { AngularFireModule } from '@angular/fire';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { FirebaseAppConfig, FirebaseOptions } from '@firebase/app-types';
-import { AngularFireModule } from 'angularfire2';
-import { AngularFirestoreModule } from 'angularfire2/firestore';
 
 import { IssuesApiService, ProjectsApiService } from '../interfaces';
 import { FIREBASE_API } from './firebase-api.token';
