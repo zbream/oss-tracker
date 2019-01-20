@@ -1,27 +1,49 @@
-# OssTracker
+# OSS Issue & Project Tracker
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.0.3.
+One-stop shop for tracking open-source software dependencies, for individuals or teams.
+Entirely hosted in [Firebase](https://firebase.google.com/).
 
-## Development server
+![Demo Image](https://raw.githubusercontent.com/zbream/oss-tracker/assets/demo.png)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Features
 
-## Code scaffolding
+* Add GitHub issue by URL.
+  * Automatically fetch metadata and status.
+  * Quick links to repo and issue.
+* Add project by NPM project name.
+  * Automatically fetch latest/next version.
+  * Quick links to repo and changelog.
+* Lists shared among all team members, with live updates.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Setup
 
-## Build
+1. Create the project.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Create a new project at <https://firebase.google.com/>. 
+This project requires the **Blaze** plan, to allow functions to make external HTTP calls.
+Find the **web app** application configuration.
 
-## Running unit tests
+Run the following:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```
+firebase use <projectId>
+```
 
-## Running end-to-end tests
+2. Configure the server.
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Generate a [GitHub Personal Access Token](https://github.com/settings/tokens) for issue retrieval. As it's only accessing public information, no additional scopes are necessary.
 
-## Further help
+Run the following:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+```
+firebase functions:config:set github.token="<token>"
+```
+
+3. Configure the client.
+
+Open the `/src/environments/environment.prod.ts` file.
+Paste in the Firebase configuration block.
+
+4. Publish!
+
+Simply run `npm run publish` to build and deploy.

@@ -2,13 +2,13 @@
  * Enforce statically that a given string is a property of a given type.
  * @param name property name
  */
-export const propertyOf = <TObj>(name: keyof TObj): string => name;
+export const propertyOf = <TObj>(name: Extract<keyof TObj, string>): string => name;
 
 /**
  * Enforce statically that multiple strings are all properties of a given type.
- * @param name property name
+ * @param names property names
  */
-export const propertiesOf = <TObj>(...name: Array<keyof TObj>): string[] => name;
+export const propertiesOf = <TObj>(...names: Array<Extract<keyof TObj, string>>): string[] => names;
 
 /**
  * Modify the object to remove any "undefined" properties. Returns a reference to the object.

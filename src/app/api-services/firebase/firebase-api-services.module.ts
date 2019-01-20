@@ -2,40 +2,41 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 
 import { AngularFireModule } from '@angular/fire';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFirestoreModule, FirestoreSettingsToken } from '@angular/fire/firestore';
 import { FirebaseAppConfig, FirebaseOptions } from '@firebase/app-types';
 
+import { environment } from '../../../environments/environment';
 import { IssuesApiService, ProjectsApiService } from '../interfaces';
 import { FIREBASE_API } from './firebase-api.token';
 import { FirebaseIssuesApiService } from './firebase-issues-api.service';
 import { FirebaseProjectsApiService } from './firebase-projects-api.service';
+import { getFirebaseFunctionsEndpoint } from './firebase-utils';
 
-const API = 'https://us-central1-oss-tracker-53e81.cloudfunctions.net/api';
-// const API = 'http://localhost:5000/oss-tracker-53e81/us-central1/api';
+export const firebaseOptions: FirebaseOptions = environment.firebase.config;
 
-const FIREBASE_OPTIONS: FirebaseOptions = {
-  apiKey: 'AIzaSyDsx_yuwiINtdyUbijJlORSpVeUS4Zk-30',
-  authDomain: 'oss-tracker-53e81.firebaseapp.com',
-  databaseURL: 'https://oss-tracker-53e81.firebaseio.com',
-  projectId: 'oss-tracker-53e81',
-  storageBucket: 'oss-tracker-53e81.appspot.com',
-  messagingSenderId: '682609695066',
+export const firebaseAppConfig: FirebaseAppConfig = {
+  name: environment.firebase.name,
 };
 
-const FIREBASE_APP_CONFIG: FirebaseAppConfig = {
-  name: 'oss-tracker-angular',
-};
+const firebaseFunctions = getFirebaseFunctionsEndpoint(
+  environment.firebase.config.projectId,
+  environment.firebase.functionsRegion,
+  environment.firebase.functionsEmulatorOrigin,
+);
+const firebaseApi = `${firebaseFunctions}/api`;
 
 @NgModule({
   imports: [
     HttpClientModule,
-    AngularFireModule.initializeApp(FIREBASE_OPTIONS, FIREBASE_APP_CONFIG),
+    AngularFireModule.initializeApp(firebaseOptions, firebaseAppConfig),
     AngularFirestoreModule,
   ],
   providers: [
-    { provide: FIREBASE_API, useValue: API },
+    { provide: FIREBASE_API, useValue: firebaseApi },
     { provide: IssuesApiService, useClass: FirebaseIssuesApiService },
     { provide: ProjectsApiService, useClass: FirebaseProjectsApiService },
+    // https://github.com/angular/angularfire2/issues/1993#issuecomment-455830987
+    { provide: FirestoreSettingsToken, useValue: { } },
   ],
 })
 export class FirebaseApiServicesModule {
@@ -44,7 +45,7 @@ export class FirebaseApiServicesModule {
     private http: HttpClient,
   ) {
     // ping the server, to wake up the function
-    this.http.get(`${API}/`).subscribe();
+    this.http.get(`${firebaseApi}/`).subscribe();
   }
 
 }

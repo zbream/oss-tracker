@@ -6,8 +6,6 @@ import { IssueRetrieverService } from "./interfaces";
 const GITHUB_URL = 'https://github.com';
 const GITHUB_API_URL = 'https://api.github.com/graphql';
 
-const GITHUB_ACCESS_TOKEN = 'd2b08172279c8263158c526ba89209d1db2da687';
-
 const GITHUB_ISSUE_QUERY = `
 query Issue($repoOwner: String!, $repoName: String!, $issueNumber: Int!) {
   repository(owner: $repoOwner, name: $repoName) {
@@ -50,7 +48,9 @@ export class HttpIssueRetrieverService implements IssueRetrieverService {
 
   private client: GraphQLClient;
 
-  constructor() {
+  constructor(
+    readonly GITHUB_ACCESS_TOKEN: string,
+  ) {
     this.client = new GraphQLClient(GITHUB_API_URL, {
       headers: {
         'User-Agent': 'OssTrackerServer (zbream)',

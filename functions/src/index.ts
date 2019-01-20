@@ -5,6 +5,7 @@ import * as functions from 'firebase-functions';
 
 import * as fixes from './fixes';
 
+import { Config } from './config';
 import { IssuesController, ProjectsController } from './controllers';
 import {
   IssueDbService,
@@ -24,13 +25,16 @@ import {
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
 
+// server config
+const config: Config = functions.config();
+
 // initialize firebase admin
 admin.initializeApp();
 const firestore = admin.firestore();
 
 // initialize services
 const issueDb: IssueDbService = new IssueDbService(firestore);
-const issueRetriever: IssueRetrieverService = new HttpIssueRetrieverService();
+const issueRetriever: IssueRetrieverService = new HttpIssueRetrieverService(config.github && config.github.token || '');
 // const issueRetriever: IssueRetrieverService = new MockIssueRetrieverService();
 const issueUpdater: IssueUpdaterService = new IssueUpdaterService(issueDb, issueRetriever);
 const projectDb: ProjectDbService = new ProjectDbService(firestore);
