@@ -17,10 +17,10 @@ import {
   ProjectRetrieverService,
   ProjectUpdaterService,
 } from './services';
-import {
-  MockIssueRetrieverService,
-  MockProjectRetrieverService,
-} from './services/mocks';
+// import {
+//   MockIssueRetrieverService,
+//   MockProjectRetrieverService,
+// } from './services/mocks';
 
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
