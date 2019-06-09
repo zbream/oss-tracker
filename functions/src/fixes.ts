@@ -1,6 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
-
-type Handler = (req: Request, res: Response, next: NextFunction) => void;
+import { RequestHandler } from 'express';
 
 /**
  * Firebase Hosting: rewrite will redirect `<app>/api/...` to `<function>/api/api/...`.
@@ -10,12 +8,10 @@ type Handler = (req: Request, res: Response, next: NextFunction) => void;
  *
  * @param apiPrefix prefix as configured in firebase.json
  */
-export function fbHostingRedirectUrlFix(apiPrefix: string): Handler {
-  const actualUrlIndex = apiPrefix.length + 1;
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (req.url.indexOf(`/${apiPrefix}/`) === 0) {
-      req.url = req.url.substring(actualUrlIndex);
-    }
+export function fbHostingRedirectUrlFix(apiPrefix: string): RequestHandler {
+  const regex = new RegExp(`^/${apiPrefix}/?`);
+  return (req, res, next) => {
+    req.url = req.url.replace(regex, '/');
     next();
   }
 }

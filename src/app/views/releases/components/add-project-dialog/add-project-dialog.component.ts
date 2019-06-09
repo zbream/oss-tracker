@@ -28,7 +28,7 @@ export class AddProjectDialogComponent implements OnInit {
     private addService: AddProjectDialogService,
   ) {
     this.form = this.addService.form;
-    this.dialogRef.beforeClose().subscribe(() => {
+    this.dialogRef.beforeClosed().subscribe(() => {
       this.addService.cancel();
     });
   }

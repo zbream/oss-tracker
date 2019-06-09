@@ -34,7 +34,7 @@ export class AddIssueDialogComponent implements OnInit {
     this.form = this.addService.form;
     this.newIssue$ = this.addService.newIssue$;
     this.newIssueRetrieved$ = this.addService.newIssueRetrieved$;
-    this.dialogRef.beforeClose().subscribe(() => {
+    this.dialogRef.beforeClosed().subscribe(() => {
       this.addService.cancel();
     });
   }

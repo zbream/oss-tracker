@@ -10,11 +10,11 @@ const ROUTES: Routes = [
   },
   {
     path: 'issues',
-    loadChildren: './views/issues/issues.module#IssuesModule',
+    loadChildren: () => import('./views/issues/issues.module').then(m => m.IssuesModule),
   },
   {
     path: 'releases',
-    loadChildren: './views/releases/releases.module#ReleasesModule',
+    loadChildren: () => import('./views/releases/releases.module').then(m => m.ReleasesModule),
   },
   {
     path: '**',
