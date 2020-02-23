@@ -12,7 +12,7 @@ const URL_REGEX = /^https?:\/\/github\.com\/(.+\/.+)\/issues\/([0-9]+)\/?(?:#.*)
 @Injectable()
 export class AddIssueDialogService {
 
-  private currentRequest?: Subscription;
+  private _currentRequest?: Subscription;
 
   readonly form: FormGroup;
 
@@ -20,8 +20,8 @@ export class AddIssueDialogService {
   readonly newIssueRetrieved$: Observable<Issue | undefined>;
 
   constructor(
-    private issuesApi: IssuesApiService,
-    private notification: NotificationService,
+    private _issuesApi: IssuesApiService,
+    private _notification: NotificationService,
   ) {
     this.form = new FormGroup({
       url: new FormControl('', [Validators.required, Validators.pattern(URL_REGEX)]),
@@ -32,13 +32,13 @@ export class AddIssueDialogService {
       debounceTime(300),
       map(value => value.url as string),
       distinctUntilChanged(),
-      map(url => this.validateUrl(url)),
+      map(url => this._validateUrl(url)),
       share(),
     );
     this.newIssueRetrieved$ = this.newIssue$.pipe(
       switchMap(newIssue => {
         if (newIssue) {
-          return this.issuesApi.tryIssue(newIssue).pipe(
+          return this._issuesApi.tryIssue(newIssue).pipe(
             startWith(undefined as any),
             catchError(() => of(undefined)),
           );
@@ -55,37 +55,37 @@ export class AddIssueDialogService {
       return;
     }
 
-    const newIssue = this.validateUrl(this.form.value.url);
+    const newIssue = this._validateUrl(this.form.value.url);
     if (!newIssue) {
       return;
     }
 
-    if (this.currentRequest && !this.currentRequest.closed) {
-      this.currentRequest.unsubscribe();
+    if (this._currentRequest && !this._currentRequest.closed) {
+      this._currentRequest.unsubscribe();
     }
 
     this.form.disable();
-    this.currentRequest = this.issuesApi.addIssue(newIssue).subscribe({
+    this._currentRequest = this._issuesApi.addIssue(newIssue).subscribe({
       next: message => {
         this.form.enable();
-        this.notification.show(message);
+        this._notification.show(message);
       },
       error: err => {
         this.form.enable();
-        this.notification.show(err);
+        this._notification.show(err);
       },
     });
   }
 
   cancel() {
-    if (this.currentRequest && !this.currentRequest.closed) {
-      this.currentRequest.unsubscribe();
-      this.currentRequest = undefined;
+    if (this._currentRequest && !this._currentRequest.closed) {
+      this._currentRequest.unsubscribe();
+      this._currentRequest = undefined;
     }
     this.form.enable();
   }
 
-  private validateUrl(url: string): NewIssue | undefined {
+  private _validateUrl(url: string): NewIssue | undefined {
     const split = URL_REGEX.exec(url);
     if (split) {
       return {

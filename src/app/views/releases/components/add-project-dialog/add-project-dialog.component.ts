@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { AddProjectDialogService } from './add-project-dialog.service';
 
@@ -24,23 +24,23 @@ export class AddProjectDialogComponent implements OnInit {
   form: FormGroup;
 
   constructor(
-    private dialogRef: MatDialogRef<AddProjectDialogComponent>,
-    private addService: AddProjectDialogService,
+    private _dialogRef: MatDialogRef<AddProjectDialogComponent>,
+    private _addService: AddProjectDialogService,
   ) {
-    this.form = this.addService.form;
-    this.dialogRef.beforeClosed().subscribe(() => {
-      this.addService.cancel();
+    this.form = this._addService.form;
+    this._dialogRef.beforeClosed().subscribe(() => {
+      this._addService.cancel();
     });
   }
 
   ngOnInit() { }
 
   onSubmit() {
-    this.addService.add();
+    this._addService.add();
   }
 
   onClose() {
-    this.dialogRef.close();
+    this._dialogRef.close();
   }
 
   onClear() {

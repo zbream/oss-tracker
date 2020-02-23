@@ -4,19 +4,19 @@ export abstract class BaseController {
 
   abstract readonly handler: Router;
 
-  protected resSuccess(res: Response, arg: string | object): void {
-    const responseArg = { result: arg };
-    return void res.status(200).json(responseArg);
+  protected _resSuccess(res: Response, arg: string | object): void {
+    const resArg = { result: arg };
+    return void res.status(200).json(resArg);
   }
 
-  protected resFailClient(res: Response, arg: string): void {
-    const responseArg = { error: arg };
-    return void res.status(400).json(responseArg);
+  protected _resFailClient(res: Response, arg: string): void {
+    const resArg = { error: arg };
+    return void res.status(400).json(resArg);
   }
 
-  protected resFailServer(res: Response, arg: string): void {
-    const responseArg = { error: arg };
-    return void res.status(500).json(responseArg);
+  protected _resFailServer(res: Response, arg: string): void {
+    const resArg = { error: arg };
+    return void res.status(500).json(resArg);
   }
 
 }

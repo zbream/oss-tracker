@@ -4,17 +4,16 @@ export const environment = {
   contact: '',
   firebase: {
     config: {
-      apiKey: '<your-key>',
+      apiKey: '<your-api-key>',
       authDomain: '<your-project-authdomain>',
       databaseURL: '<your-database-URL>',
       projectId: '<your-project-id>',
       storageBucket: '<your-storage-bucket>',
       messagingSenderId: '<your-messaging-sender-id>',
       appId: '<your-app-id>',
+      measurementId: '<your-measurement-id>',
     },
-    name: 'oss-tracker-angular',
     functionsRegion: 'us-central1',
-    functionsEmulatorOrigin: undefined,
-    // functionsEmulatorOrigin: 'http://localhost:5000',
+    functionsLocal: true,
   },
 };

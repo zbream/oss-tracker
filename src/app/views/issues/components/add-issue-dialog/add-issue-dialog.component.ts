@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 
 import { Issue, NewIssue } from '../../../../models/issue';
@@ -28,25 +28,25 @@ export class AddIssueDialogComponent implements OnInit {
   newIssueRetrieved$: Observable<Issue | undefined>;
 
   constructor(
-    private dialogRef: MatDialogRef<AddIssueDialogComponent>,
-    private addService: AddIssueDialogService,
+    private _dialogRef: MatDialogRef<AddIssueDialogComponent>,
+    private _addService: AddIssueDialogService,
   ) {
-    this.form = this.addService.form;
-    this.newIssue$ = this.addService.newIssue$;
-    this.newIssueRetrieved$ = this.addService.newIssueRetrieved$;
-    this.dialogRef.beforeClosed().subscribe(() => {
-      this.addService.cancel();
+    this.form = this._addService.form;
+    this.newIssue$ = this._addService.newIssue$;
+    this.newIssueRetrieved$ = this._addService.newIssueRetrieved$;
+    this._dialogRef.beforeClosed().subscribe(() => {
+      this._addService.cancel();
     });
   }
 
   ngOnInit() { }
 
   onSubmit() {
-    this.addService.add();
+    this._addService.add();
   }
 
   onClose() {
-    this.dialogRef.close();
+    this._dialogRef.close();
   }
 
   onClear() {

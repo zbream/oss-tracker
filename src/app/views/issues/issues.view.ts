@@ -23,13 +23,13 @@ export class IssuesView implements OnInit {
   _refreshedDate$: Observable<Date | undefined>;
 
   constructor(
-    private issuesApi: IssuesApiService,
-    private issuesDialog: IssuesDialogService,
-    private notification: NotificationService,
+    private _issuesApi: IssuesApiService,
+    private _issuesDialog: IssuesDialogService,
+    private _notification: NotificationService,
   ) {
     this._filterFormControl = new FormControl('');
 
-    const issues$ = this.issuesApi.getIssues$();
+    const issues$ = this._issuesApi.getIssues$();
     const filter$ = this._filterFormControl.valueChanges.pipe(
       debounceTime(150),
       startWith(this._filterFormControl.value),
@@ -48,29 +48,25 @@ export class IssuesView implements OnInit {
       }),
     );
 
-    this._refreshInProgress$ = this.issuesApi.getRefreshInProgress$();
-    this._refreshedDate$ = this.issuesApi.getRefreshedDate$();
+    this._refreshInProgress$ = this._issuesApi.getRefreshInProgress$();
+    this._refreshedDate$ = this._issuesApi.getRefreshedDate$();
   }
 
   ngOnInit() { }
 
   _onRefresh() {
-    this.issuesApi.refreshIssues().subscribe({
+    this._issuesApi.refreshIssues().subscribe({
       next: message => {
-        this.notification.show(message);
+        this._notification.show(message);
       },
       error: err => {
-        this.notification.show(err);
+        this._notification.show(err);
       },
     });
   }
 
   _onAdd() {
-    this.issuesDialog.showAddDialog$().subscribe();
-    // this.issuesApi.addIssue({ projectName: 'ReactiveX/rxjs', issueNumber: 2900 }).subscribe({
-    //   next: () => console.log('Added successfully'),
-    //   error: err => console.error(err),
-    // });
+    this._issuesDialog.showAddDialog$().subscribe();
   }
 
   readonly _trackByFn: TrackByFunction<Issue> = (index, item) => item.id;

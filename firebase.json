@@ -11,7 +11,7 @@
   },
   "hosting": {
     "predeploy": [
-      "./node_modules/.bin/cpx \"dist/oss-tracker/**/*\" \"$RESOURCE_DIR\" --clean"
+      "./node_modules/.bin/cpx \"dist/oss-tracker/browser/**/*\" \"$RESOURCE_DIR\" --clean"
     ],
     "public": "public",
     "ignore": [
@@ -21,10 +21,6 @@
     ],
     "rewrites": [
       {
-        "source": "/api",
-        "function": "api"
-      },
-      {
         "source": "/api/**",
         "function": "api"
       },
@@ -33,5 +29,16 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "hosting": {
+      "port": 5000
+    }
   }
 }

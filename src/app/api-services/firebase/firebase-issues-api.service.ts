@@ -1,16 +1,15 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 
-import { AngularFirestore } from '@angular/fire/firestore';
 import { firestore } from 'firebase/app';
+import { collectionData, docData } from 'rxfire/firestore';
 
 import { Issue, NewIssue } from '../../models/issue';
 import { IssuesApiService } from '../interfaces';
-import { ApiResult, parseApiError } from './firebase-api-responses';
-import { FIREBASE_API } from './firebase-api.token';
-import { parseFirebaseDate } from './firebase-utils';
+import { ApiResult, FirebaseResponseService } from './firebase-response.service';
+import { FirebaseService } from './firebase.service';
 
 interface ApiIssue {
   projectName: string;
@@ -33,71 +32,73 @@ interface ApiIssueState {
 @Injectable()
 export class FirebaseIssuesApiService implements IssuesApiService {
 
+  private _fbFirestore: firestore.Firestore;
+
   constructor(
-    @Inject(FIREBASE_API) private api: string,
-    private http: HttpClient,
-    private ngFirestore: AngularFirestore,
-  ) {}
+    private _http: HttpClient,
+    private _fbService: FirebaseService,
+    private _fbResponseService: FirebaseResponseService,
+  ) {
+    this._fbFirestore = this._fbService.app.firestore();
+  }
 
   getIssues$(): Observable<Issue[]> {
-    return this.ngFirestore.collection<ApiIssue>('issues').snapshotChanges().pipe(
-      map(actions => actions.map(action => {
-        const id = action.payload.doc.id;
-        const issue = action.payload.doc.data() as ApiIssue;
-        return this.parseIssue(id, issue);
-      })),
+    return collectionData<ApiIssue & { id: string }>(this._fbFirestore.collection('issues'), 'id').pipe(
+      map(issues => issues.map(issue => this._parseIssue(issue.id, issue))),
     );
   }
 
   getRefreshInProgress$(): Observable<boolean> {
-    return this.ngFirestore.doc<ApiIssueState>('state/issues').valueChanges().pipe(
-      map(state => state ? state.refreshInProgress : false),
+    return docData<ApiIssueState>(this._fbFirestore.doc('state/issues')).pipe(
+      map(state => state.refreshInProgress),
+      distinctUntilChanged(),
     );
   }
 
   getRefreshedDate$(): Observable<Date | undefined> {
-    return this.ngFirestore.doc<ApiIssueState>('state/issues').valueChanges().pipe(
-      map(state => (state && state.refreshed) ? parseFirebaseDate(state.refreshed) : undefined),
+    return docData<ApiIssueState>(this._fbFirestore.doc('state/issues')).pipe(
+      map(state => state.refreshed ? this._fbResponseService.parseFirebaseDate(state.refreshed) : undefined),
+      distinctUntilChanged(),
     );
   }
 
   addIssue(newIssue: NewIssue): Observable<string> {
-    return this.http.post<ApiResult>(`${this.api}/issues/add`, newIssue).pipe(
-      map(response => response.result),
-      catchError(parseApiError),
+    return this._http.post<ApiResult>(`${this._fbService.api}/issues/add`, newIssue).pipe(
+      map(({ result }) => result),
+      catchError(this._fbResponseService.parseApiError),
     );
   }
 
   deleteIssue(id: string): Observable<string> {
-    return this.http.delete<ApiResult>(`${this.api}/issues/delete/${id}`).pipe(
-      map(response => response.result),
-      catchError(parseApiError),
+    return this._http.delete<ApiResult>(`${this._fbService.api}/issues/delete/${id}`).pipe(
+      map(({ result }) => result),
+      catchError(this._fbResponseService.parseApiError),
     );
   }
 
   refreshIssues(): Observable<string> {
-    return this.http.put<ApiResult>(`${this.api}/issues/refresh`, {}).pipe(
-      map(response => response.result),
-      catchError(parseApiError),
+    return this._http.put<ApiResult>(`${this._fbService.api}/issues/refresh`, {}).pipe(
+      map(({ result }) => result),
+      catchError(this._fbResponseService.parseApiError),
     );
   }
 
   tryIssue(newIssue: NewIssue): Observable<Issue> {
-    return this.http.post<ApiResult<ApiIssue>>(`${this.api}/issues/info`, newIssue).pipe(
-      map(response => this.parseIssue('', response.result)),
-      catchError(parseApiError),
+    return this._http.post<ApiResult<ApiIssue>>(`${this._fbService.api}/issues/info`, newIssue).pipe(
+      map(({ result }) => this._parseIssue('', result)),
+      catchError(this._fbResponseService.parseApiError),
     );
   }
 
-  private parseIssue(id: string, apiIssue: ApiIssue): Issue {
+  private _parseIssue(id: string, apiIssue: ApiIssue): Issue {
     return {
       id,
       project: apiIssue.projectName,
       issue: apiIssue.issueNumber,
       description: apiIssue.data.issueDescription,
       status: apiIssue.data.status,
-      closedDate: apiIssue.data.closedDate ? parseFirebaseDate(apiIssue.data.closedDate) : undefined,
-      latestActivityDate: parseFirebaseDate(apiIssue.data.latestActivityDate),
+      closedDate: apiIssue.data.closedDate ? this._fbResponseService.parseFirebaseDate(apiIssue.data.closedDate) : undefined,
+      latestActivityDate: this._fbResponseService.parseFirebaseDate(apiIssue.data.latestActivityDate),
       links: {
         project: apiIssue.data.linkProject,
         issue: apiIssue.data.linkIssue,

@@ -1,5 +1,6 @@
-import { Issue, IssueState, NewIssue } from '../../models';
-import { propertyOf, sanitizeForDb } from '../../utils';
+import { Issue, IssueState, NEW_ISSUE_PROPS, NewIssue } from '../../models';
+import { propertyOf } from '../../utils';
+import { sanitizeForDb } from './db-utils';
 
 export class IssueDbService {
 
@@ -13,12 +14,15 @@ export class IssueDbService {
     this._stateRef = firestore.doc('state/issues');
   }
 
-  get issuesRef() {
-    return this._collectionRef;
+  async getIssuesForRefresh(): Promise<FirebaseFirestore.QuerySnapshot> {
+    const querySnapshot = await this._collectionRef
+      .select(...NEW_ISSUE_PROPS)
+      .get();
+    return querySnapshot;
   }
 
-  async addIssue(newIssue: Issue): Promise<void> {
-    await this._collectionRef.add(sanitizeForDb(newIssue));
+  async getIssue(id: string): Promise<FirebaseFirestore.DocumentSnapshot> {
+    return await this._collectionRef.doc(id).get();
   }
 
   async hasIssue(newIssue: NewIssue): Promise<boolean> {
@@ -30,40 +34,48 @@ export class IssueDbService {
     return querySnapshot.size > 0;
   }
 
+  async addIssue(newIssue: Issue): Promise<void> {
+    return void await this._collectionRef.add(sanitizeForDb(newIssue));
+  }
+
+  async updateIssue(ref: FirebaseFirestore.DocumentReference, newIssue: Issue): Promise<void> {
+    return void await ref.update(sanitizeForDb(newIssue));
+  }
+
   async deleteIssue(id: string): Promise<boolean> {
-    const issueSnapshot = await this._collectionRef.doc(id).get();
+    const issueSnapshot = await this.getIssue(id);
     if (!issueSnapshot.exists) {
       return false;
     }
-
     await issueSnapshot.ref.delete();
     return true;
   }
 
   async getRefreshInProgress(): Promise<boolean> {
-    const state = await this.getState();
-    return state ? state.refreshInProgress : false;
+    const state = await this._getState();
+    return state?.refreshInProgress || false;
   }
 
   async setRefreshInProgress(value: boolean): Promise<void> {
-    return await this.updateState({ refreshInProgress: value });
+    return await this._updateState({ refreshInProgress: value });
   }
 
   async getRefreshed(): Promise<Date | undefined> {
-    const state = await this.getState();
-    return state ? state.refreshed : undefined;
+    const state = await this._getState();
+    return state?.refreshed;
   }
 
   async setRefreshed(value: Date): Promise<void> {
-    return await this.updateState({ refreshed: value });
+    return await this._updateState({ refreshed: value });
   }
 
-  private async getState(): Promise<IssueState | undefined> {
-    return (await this._stateRef.get()).data() as IssueState | undefined;
+  private async _getState(): Promise<IssueState | undefined> {
+    const state = (await this._stateRef.get()).data() as IssueState;
+    return state;
   }
 
-  private async updateState(value: Partial<IssueState>): Promise<void> {
-    return await void this._stateRef.update(value);
+  private async _updateState(value: Partial<IssueState>): Promise<void> {
+    return void await this._stateRef.update(value);
   }
 
 }

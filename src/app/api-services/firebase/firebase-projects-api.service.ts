@@ -1,16 +1,15 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 
-import { AngularFirestore } from '@angular/fire/firestore';
 import { firestore } from 'firebase/app';
+import { collectionData, docData } from 'rxfire/firestore';
 
 import { NewProject, Project } from '../../models/project';
 import { ProjectsApiService } from '../interfaces';
-import { ApiResult, parseApiError } from './firebase-api-responses';
-import { FIREBASE_API } from './firebase-api.token';
-import { parseFirebaseDate } from './firebase-utils';
+import { ApiResult, FirebaseResponseService } from './firebase-response.service';
+import { FirebaseService } from './firebase.service';
 
 interface ApiProject {
   name: string;
@@ -32,63 +31,65 @@ interface ApiProjectState {
 @Injectable()
 export class FirebaseProjectsApiService implements ProjectsApiService {
 
+  private _fbFirestore: firestore.Firestore;
+
   constructor(
-    @Inject(FIREBASE_API) private api: string,
-    private http: HttpClient,
-    private ngFirestore: AngularFirestore,
-  ) {}
+    private _http: HttpClient,
+    private _fbService: FirebaseService,
+    private _fbResponseService: FirebaseResponseService,
+  ) {
+    this._fbFirestore = this._fbService.app.firestore();
+  }
 
   getProjects$(): Observable<Project[]> {
-    return this.ngFirestore.collection<ApiProject>('projects').snapshotChanges().pipe(
-      map(actions => actions.map(action => {
-        const id = action.payload.doc.id;
-        const project = action.payload.doc.data() as ApiProject;
-        return this.parseProject(id, project);
-      })),
+    return collectionData<ApiProject & { id: string }>(this._fbFirestore.collection('projects')).pipe(
+      map(projects => projects.map(project => this._parseProject(project.id, project))),
     );
   }
 
   getRefreshInProgress$(): Observable<boolean> {
-    return this.ngFirestore.doc<ApiProjectState>('state/projects').valueChanges().pipe(
-      map(state => state ? state.refreshInProgress : false),
+    return docData<ApiProjectState>(this._fbFirestore.doc('state/projects')).pipe(
+      map(state => state.refreshInProgress),
+      distinctUntilChanged(),
     );
   }
 
   getRefreshedDate$(): Observable<Date | undefined> {
-    return this.ngFirestore.doc<ApiProjectState>('state/projects').valueChanges().pipe(
-      map(state => (state && state.refreshed) ? parseFirebaseDate(state.refreshed) : undefined),
+    return docData<ApiProjectState>(this._fbFirestore.doc('state/projects')).pipe(
+      map(state => state.refreshed ? this._fbResponseService.parseFirebaseDate(state.refreshed) : undefined),
+      distinctUntilChanged(),
     );
   }
 
   addProject(newProject: NewProject): Observable<string> {
-    return this.http.post<ApiResult>(`${this.api}/projects/add`, newProject).pipe(
-      map(response => response.result),
-      catchError(parseApiError),
+    return this._http.post<ApiResult>(`${this._fbService.api}/projects/add`, newProject).pipe(
+      map(({ result }) => result),
+      catchError(this._fbResponseService.parseApiError),
     );
   }
 
   deleteProject(id: string): Observable<string> {
-    return this.http.delete<ApiResult>(`${this.api}/projects/delete/${id}`).pipe(
-      map(response => response.result),
-      catchError(parseApiError),
+    return this._http.delete<ApiResult>(`${this._fbService.api}/projects/delete/${id}`).pipe(
+      map(({ result }) => result),
+      catchError(this._fbResponseService.parseApiError),
     );
   }
 
   refreshProjects(): Observable<string> {
-    return this.http.put<ApiResult>(`${this.api}/projects/refresh`, {}).pipe(
-      map(response => response.result),
-      catchError(parseApiError),
+    return this._http.put<ApiResult>(`${this._fbService.api}/projects/refresh`, {}).pipe(
+      map(({ result }) => result),
+      catchError(this._fbResponseService.parseApiError),
     );
   }
 
   tryProject(newProject: NewProject): Observable<Project> {
-    return this.http.post<ApiResult<ApiProject>>(`${this.api}/projects/info`, newProject).pipe(
-      map(response => this.parseProject('', response.result)),
-      catchError(parseApiError),
+    return this._http.post<ApiResult<ApiProject>>(`${this._fbService.api}/projects/info`, newProject).pipe(
+      map(({ result }) => this._parseProject('', result)),
+      catchError(this._fbResponseService.parseApiError),
     );
   }
 
-  private parseProject(id: string, apiProject: ApiProject): Project {
+  private _parseProject(id: string, apiProject: ApiProject): Project {
     return {
       id,
       name: apiProject.name,
@@ -98,11 +99,11 @@ export class FirebaseProjectsApiService implements ProjectsApiService {
       },
       latest: {
         version: apiProject.data.latestVersion,
-        date: parseFirebaseDate(apiProject.data.latestDate),
+        date: this._fbResponseService.parseFirebaseDate(apiProject.data.latestDate),
       },
       next: apiProject.data.nextVersion ? {
-        version: apiProject.data.nextVersion!,
-        date: parseFirebaseDate(apiProject.data.nextDate!),
+        version: apiProject.data.nextVersion,
+        date: this._fbResponseService.parseFirebaseDate(apiProject.data.nextDate!),
       } : undefined,
     };
   }

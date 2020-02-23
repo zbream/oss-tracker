@@ -66,7 +66,7 @@ export class MockProjectRetrieverService implements ProjectRetrieverService {
       (mockProject.name === project.name)
     );
     await delayPromise(5000);
-    return matchingProject ? matchingProject.data : undefined;
+    return matchingProject?.data;
   }
 
 }

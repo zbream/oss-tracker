@@ -9,36 +9,36 @@ export class IssuesController extends BaseController {
   readonly handler: Router;
 
   constructor(
-    private issueDb: IssueDbService,
-    private issueRetriever: IssueRetrieverService,
-    private issueUpdater: IssueUpdaterService,
+    private _issueDb: IssueDbService,
+    private _issueRetriever: IssueRetrieverService,
+    private _issueUpdater: IssueUpdaterService,
   ) {
     super();
 
     const router = Router();
-    router.post('/add', this.handleAdd.bind(this));
-    router.post('/info', this.handleInfo.bind(this));
-    router.put('/refresh', this.handleRefresh.bind(this));
-    router.delete('/delete/:id', this.handleDelete.bind(this));
+    router.post('/add', this._handleAdd.bind(this));
+    router.post('/info', this._handleInfo.bind(this));
+    router.put('/refresh', this._handleRefresh.bind(this));
+    router.delete('/delete/:id', this._handleDelete.bind(this));
 
     this.handler = router;
   }
 
-  private async handleAdd(req: Request, res: Response): Promise<void> {
+  private async _handleAdd(req: Request, res: Response): Promise<void> {
     try {
-      const newIssue = this.parseNewIssue(req.body);
+      const newIssue = this._parseNewIssue(req.body);
       if (!newIssue) {
-        return this.resFailClient(res, 'Failed to parse issue from client.');
+        return this._resFailClient(res, 'Failed to parse issue from client.');
       }
 
-      const alreadyExists = await this.issueDb.hasIssue(newIssue);
+      const alreadyExists = await this._issueDb.hasIssue(newIssue);
       if (alreadyExists) {
-        return this.resFailClient(res, 'The issue already exists in the database.');
+        return this._resFailClient(res, 'The issue already exists in the database.');
       }
 
-      const issueData = await this.issueRetriever.retrieveIssue(newIssue);
+      const issueData = await this._issueRetriever.retrieveIssue(newIssue);
       if (!issueData) {
-        return this.resFailClient(res, 'Failed to find repo or issue.');
+        return this._resFailClient(res, 'Failed to find repo or issue.');
       }
 
       const issue: Issue = {
@@ -46,25 +46,25 @@ export class IssuesController extends BaseController {
         ...newIssue,
         data: issueData,
       };
-      await this.issueDb.addIssue(issue);
+      await this._issueDb.addIssue(issue);
 
-      return this.resSuccess(res, 'Issue added successfully.');
+      return this._resSuccess(res, 'Issue added successfully.');
     } catch (err) {
       console.error(err);
-      return this.resFailServer(res, 'Unknown failure.');
+      return this._resFailServer(res, 'Unknown failure.');
     }
   }
 
-  private async handleInfo(req: Request, res: Response): Promise<void> {
+  private async _handleInfo(req: Request, res: Response): Promise<void> {
     try {
-      const newIssue = this.parseNewIssue(req.body);
+      const newIssue = this._parseNewIssue(req.body);
       if (!newIssue) {
-        return this.resFailClient(res, 'Failed to parse issue from client.');
+        return this._resFailClient(res, 'Failed to parse issue from client.');
       }
 
-      const issueData = await this.issueRetriever.retrieveIssue(newIssue);
+      const issueData = await this._issueRetriever.retrieveIssue(newIssue);
       if (!issueData) {
-        return this.resFailClient(res, 'Failed to find repo or issue.');
+        return this._resFailClient(res, 'Failed to find repo or issue.');
       }
 
       const issue: Issue = {
@@ -73,44 +73,44 @@ export class IssuesController extends BaseController {
         data: issueData,
       };
 
-      return this.resSuccess(res, issue);
+      return this._resSuccess(res, issue);
     } catch (err) {
       console.error(err);
-      return this.resFailServer(res, 'Unknown failure.');
+      return this._resFailServer(res, 'Unknown failure.');
     }
   }
 
-  private async handleRefresh(req: Request, res: Response): Promise<void> {
+  private async _handleRefresh(req: Request, res: Response): Promise<void> {
     try {
-      const refreshInProgress = await this.issueDb.getRefreshInProgress();
+      const refreshInProgress = await this._issueDb.getRefreshInProgress();
       if (refreshInProgress) {
-        return this.resSuccess(res, 'A refresh is in progress.');
+        return this._resSuccess(res, 'A refresh is in progress.');
       }
 
-      await this.issueUpdater.updateAll();
-      return this.resSuccess(res, 'Issues refreshed.');
+      await this._issueUpdater.updateAll();
+      return this._resSuccess(res, 'Issues refreshed.');
     } catch (err) {
       console.error(err);
-      return this.resFailServer(res, 'Unknown failure.');
+      return this._resFailServer(res, 'Unknown failure.');
     }
   }
 
-  private async handleDelete(req: Request, res: Response): Promise<void> {
+  private async _handleDelete(req: Request, res: Response): Promise<void> {
     try {
       const id = req.query.id as string;
-      const deleted = await this.issueDb.deleteIssue(id);
+      const deleted = await this._issueDb.deleteIssue(id);
       if (deleted) {
-        return this.resSuccess(res, 'Issue deleted successfully.');
+        return this._resSuccess(res, 'Issue deleted successfully.');
       } else {
-        return this.resFailClient(res, 'Issue does not exist in the database.');
+        return this._resFailClient(res, 'Issue does not exist in the database.');
       }
     } catch (err) {
       console.error(err);
-      return this.resFailServer(res, 'Unknown failure.');
+      return this._resFailServer(res, 'Unknown failure.');
     }
   }
 
-  private parseNewIssue(body: any): NewIssue | undefined {
+  private _parseNewIssue(body: any): NewIssue | undefined {
     try {
       // parse
       const newIssue: NewIssue = {

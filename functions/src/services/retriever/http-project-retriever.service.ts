@@ -1,32 +1,32 @@
 import fetch from 'node-fetch';
 
 import { NewProject, ProjectData } from '../../models';
-import { ProjectRetrieverService } from "./interfaces";
+import { ProjectRetrieverService } from './interfaces';
 
 const NPM_API_URL = 'https://registry.npmjs.org';
 const NPM_LATEST_TAG = 'latest';
 
 const HEADERS = {
-  'Accept': 'application/json',
-  // 'Accept': 'application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*',
+  Accept: 'application/json',
+  // Accept' 'application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*',
 };
 
 interface NpmPackageResponse {
   name: string;
   'dist-tags': {
-    latest: string,
-    [key: string]: string | undefined,
-  },
+    latest: string;
+    [key: string]: string | undefined;
+  };
   time: {
-    [key: string]: string | undefined,
-  },
+    [key: string]: string | undefined;
+  };
 }
 
 export class HttpProjectRetrieverService implements ProjectRetrieverService {
 
   async retrieveProject(project: NewProject): Promise<ProjectData | undefined> {
 
-    const url = this.createNpmUrl(project.name);
+    const url = this._createNpmUrl(project.name);
 
     try {
       const response = await fetch(url, {
@@ -38,15 +38,15 @@ export class HttpProjectRetrieverService implements ProjectRetrieverService {
       }
 
       const responsePackage: NpmPackageResponse = await response.json();
-      const responseVersions = responsePackage["dist-tags"];
+      const responseVersions = responsePackage['dist-tags'];
       const responseDates = responsePackage.time;
 
-      // latest (must be in the response)
+      // latest (required)
       const latestTag = NPM_LATEST_TAG;
       const latestVersion = responseVersions[latestTag];
       const latestDate = new Date(Date.parse(responseDates[latestVersion]!));
 
-      // next (optionally included)
+      // next (optional)
       const nextTag = project.nextTag;
       let nextVersion: string | undefined;
       let nextDate: Date | undefined;
@@ -61,8 +61,8 @@ export class HttpProjectRetrieverService implements ProjectRetrieverService {
         nextVersion,
         nextDate,
       };
-
       return projectData;
+
     } catch (err) {
       // some unknown non-network error
       console.warn(err);
@@ -70,7 +70,7 @@ export class HttpProjectRetrieverService implements ProjectRetrieverService {
     }
   }
 
-  private createNpmUrl(packageName: string): string {
+  private _createNpmUrl(packageName: string): string {
     const uriComponent = encodeURIComponent(packageName).replace('%40', '@');
     return `${NPM_API_URL}/${uriComponent}`;
   }

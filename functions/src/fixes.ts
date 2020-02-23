@@ -13,5 +13,5 @@ export function fbHostingRedirectUrlFix(apiPrefix: string): RequestHandler {
   return (req, res, next) => {
     req.url = req.url.replace(regex, '/');
     next();
-  }
+  };
 }

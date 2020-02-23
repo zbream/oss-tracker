@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 
 import { IssueData, NewIssue } from '../../models';
-import { IssueRetrieverService } from "./interfaces";
+import { IssueRetrieverService } from './interfaces';
 
 const GITHUB_URL = 'https://github.com';
 const GITHUB_API_URL = 'https://api.github.com/graphql';
@@ -28,30 +28,30 @@ query Issue($repoOwner: String!, $repoName: String!, $issueNumber: Int!) {
 
 interface GithubIssueQueryResponse {
   repository: {
-    resourcePath: string,
+    resourcePath: string;
     issue: {
-      title: string,
-      resourcePath: string,
-      state: string,
-      closedAt?: string,
-      publishedAt: string,
+      title: string;
+      resourcePath: string;
+      state: string;
+      closedAt?: string;
+      publishedAt: string;
       comments: {
         nodes: [{
           publishedAt: string,
-        } | undefined]
-      }
-    }
-  }
+        } | undefined];
+      };
+    };
+  };
 }
 
 export class HttpIssueRetrieverService implements IssueRetrieverService {
 
-  private client: GraphQLClient;
+  private _client: GraphQLClient;
 
   constructor(
-    readonly GITHUB_ACCESS_TOKEN: string,
+    GITHUB_ACCESS_TOKEN: string,
   ) {
-    this.client = new GraphQLClient(GITHUB_API_URL, {
+    this._client = new GraphQLClient(GITHUB_API_URL, {
       headers: {
         'User-Agent': 'OssTrackerServer (zbream)',
         'Authorization': `bearer ${GITHUB_ACCESS_TOKEN}`,
@@ -60,16 +60,17 @@ export class HttpIssueRetrieverService implements IssueRetrieverService {
   }
 
   async retrieveIssue(issue: NewIssue): Promise<IssueData | undefined> {
-    const split = this.splitOwnerAndName(issue.projectName);
+
+    const split = this._splitOwnerAndName(issue.projectName);
     if (!split) {
       console.warn(`Cannot determine Repo Owner+Name of "${issue.projectName}".`);
       return undefined;
     }
     const [ repoOwner, repoName ] = split;
-    const issueNumber = issue.issueNumber;
+    const { issueNumber } = issue;
 
     try {
-      const response = await this.client.request<GithubIssueQueryResponse>(
+      const response = await this._client.request<GithubIssueQueryResponse>(
         GITHUB_ISSUE_QUERY,
         { repoOwner, repoName, issueNumber },
       );
@@ -78,25 +79,25 @@ export class HttpIssueRetrieverService implements IssueRetrieverService {
 
       // latest activity is determined by latest comment, then by publish date
       const latestComment = responseIssue.comments.nodes[0];
-      const latestActivity = latestComment ? latestComment.publishedAt : responseIssue.publishedAt;
+      const latestActivity = latestComment?.publishedAt || responseIssue.publishedAt;
 
       const issueData: IssueData = {
         issueDescription: responseIssue.title,
         status: responseIssue.state,
         closedDate: responseIssue.closedAt ? new Date(Date.parse(responseIssue.closedAt)) : undefined,
         latestActivityDate: new Date(Date.parse(latestActivity)),
-        linkProject: this.createGitHubUrl(responseRepo.resourcePath),
-        linkIssue: this.createGitHubUrl(responseIssue.resourcePath),
+        linkProject: this._createGithubUrl(responseRepo.resourcePath),
+        linkIssue: this._createGithubUrl(responseIssue.resourcePath),
       };
-
       return issueData;
+
     } catch (err) {
       console.warn(err);
       return undefined;
     }
   }
 
-  private splitOwnerAndName(repo: string): [string, string] | undefined {
+  private _splitOwnerAndName(repo: string): [string, string] | undefined {
     const split = /^@?(.+)\/(.+)$/.exec(repo);
     if (split) {
       return [ split[1], split[2] ];
@@ -105,7 +106,7 @@ export class HttpIssueRetrieverService implements IssueRetrieverService {
     }
   }
 
-  private createGitHubUrl(resourcePath: string) {
+  private _createGithubUrl(resourcePath: string) {
     return `${GITHUB_URL}${resourcePath}`;
   }
 

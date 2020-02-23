@@ -41,7 +41,7 @@ export class MockIssueRetrieverService implements IssueRetrieverService {
       (mockIssue.issueNumber === issue.issueNumber)
     );
     await delayPromise(5000);
-    return matchingIssue ? matchingIssue.data : undefined;
+    return matchingIssue?.data;
   }
 
 }

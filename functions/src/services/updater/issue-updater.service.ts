@@ -1,57 +1,53 @@
-import { Issue, NewIssue, NEW_ISSUE_PROPS } from '../../models';
-import { sanitizeForDb } from '../../utils';
-
+import { Issue, NewIssue } from '../../models';
 import { IssueDbService } from '../db/issue-db.service';
 import { IssueRetrieverService } from '../retriever/interfaces';
 
 export class IssueUpdaterService {
 
   constructor(
-    private issueDb: IssueDbService,
-    private issueRetriever: IssueRetrieverService,
+    private _issueDb: IssueDbService,
+    private _issueRetriever: IssueRetrieverService,
   ) {}
 
   async updateAll(): Promise<void> {
     try {
-      await this.issueDb.setRefreshInProgress(true);
+      await this._issueDb.setRefreshInProgress(true);
 
-      const issuesSnapshot = await this.issueDb.issuesRef
-        .select(...NEW_ISSUE_PROPS)
-        .get();
+      const issuesSnapshot = await this._issueDb.getIssuesForRefresh();
 
       const timestamp = new Date(Date.now());
-      await this.issueDb.setRefreshed(timestamp);
+      await this._issueDb.setRefreshed(timestamp);
 
-      const updates = issuesSnapshot.docs.map(issueSnapshot => this.updateIssue(issueSnapshot, timestamp));
+      const updates = issuesSnapshot.docs.map(issueSnapshot => this._updateIssue(issueSnapshot, timestamp));
       await Promise.all(updates);
     } finally {
-      await this.issueDb.setRefreshInProgress(false);
+      await this._issueDb.setRefreshInProgress(false);
     }
   }
 
   async updateOne(id: string): Promise<boolean> {
-    const issueSnapshot = await this.issueDb.issuesRef.doc(id).get();
+    const issueSnapshot = await this._issueDb.getIssue(id);
     if (!issueSnapshot.exists) {
       return false;
     }
 
     const timestamp = new Date(Date.now());
-    await this.updateIssue(issueSnapshot, timestamp);
+    await this._updateIssue(issueSnapshot, timestamp);
     return true;
   }
 
-  private async updateIssue(issueSnapshot: FirebaseFirestore.DocumentSnapshot, timestamp: Date): Promise<void> {
+  private async _updateIssue(issueSnapshot: FirebaseFirestore.DocumentSnapshot, timestamp: Date): Promise<void> {
     try {
       // assume the snapshot contains data (the Document exists)
       const issue = issueSnapshot.data() as NewIssue;
-      const updatedIssueData = await this.issueRetriever.retrieveIssue(issue);
-      if (updatedIssueData !== undefined) {
+      const updatedIssueData = await this._issueRetriever.retrieveIssue(issue);
+      if (updatedIssueData) {
         const updatedIssue: Issue = {
           refreshed: timestamp,
           ...issue,
           data: updatedIssueData,
         };
-        await issueSnapshot.ref.update(sanitizeForDb(updatedIssue));
+        await this._issueDb.updateIssue(issueSnapshot.ref, updatedIssue);
       }
     } catch (err) {
       console.error(err);

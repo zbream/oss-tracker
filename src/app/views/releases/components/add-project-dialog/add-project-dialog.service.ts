@@ -9,13 +9,13 @@ import { NotificationService } from '../../../../services/notification.service';
 @Injectable()
 export class AddProjectDialogService {
 
-  private currentRequest?: Subscription;
+  private _currentRequest?: Subscription;
 
   readonly form: FormGroup;
 
   constructor(
-    private projectsApi: ProjectsApiService,
-    private notification: NotificationService,
+    private _projectsApi: ProjectsApiService,
+    private _notification: NotificationService,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', Validators.required),
@@ -37,27 +37,27 @@ export class AddProjectDialogService {
       linkChangelog: this.form.value.linkChangelog,
     };
 
-    if (this.currentRequest && !this.currentRequest.closed) {
-      this.currentRequest.unsubscribe();
+    if (this._currentRequest && !this._currentRequest.closed) {
+      this._currentRequest.unsubscribe();
     }
 
     this.form.disable();
-    this.currentRequest = this.projectsApi.addProject(newProject).subscribe({
+    this._currentRequest = this._projectsApi.addProject(newProject).subscribe({
       next: message => {
         this.form.enable();
-        this.notification.show(message);
+        this._notification.show(message);
       },
       error: err => {
         this.form.enable();
-        this.notification.show(err);
+        this._notification.show(err);
       },
     });
   }
 
   cancel() {
-    if (this.currentRequest && !this.currentRequest.closed) {
-      this.currentRequest.unsubscribe();
-      this.currentRequest = undefined;
+    if (this._currentRequest && !this._currentRequest.closed) {
+      this._currentRequest.unsubscribe();
+      this._currentRequest = undefined;
     }
     this.form.enable();
   }

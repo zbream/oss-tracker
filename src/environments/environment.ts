@@ -5,21 +5,32 @@
 export const environment = {
   production: false,
   useMocks: false,
+
+  // Help link at the top of the window.
   contact: '',
+
   firebase: {
+    // Firebase WebApp config, from console.
     config: {
-      apiKey: '<your-key>',
+      apiKey: '<your-api-key>',
       authDomain: '<your-project-authdomain>',
       databaseURL: '<your-database-URL>',
       projectId: '<your-project-id>',
       storageBucket: '<your-storage-bucket>',
       messagingSenderId: '<your-messaging-sender-id>',
       appId: '<your-app-id>',
+      measurementId: '<your-measurement-id>',
     },
-    name: 'oss-tracker-angular',
+
+    // Firebase Cloud Function region, from console.
     functionsRegion: 'us-central1',
+
+    // Override: talk to local emulated functions
     functionsEmulatorOrigin: undefined,
     // functionsEmulatorOrigin: 'http://localhost:5000',
+
+    // Override: talk to functions through "/api" rewrite
+    functionsLocal: false,
   },
 };
 

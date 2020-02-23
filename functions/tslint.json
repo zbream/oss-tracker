@@ -1,4 +1,5 @@
 {
+  "extends": "../tslint.json",
   "rules": {
     // -- Strict errors --
     // These lint rules are likely always a good idea.
@@ -65,10 +66,7 @@
     // Disallow control flow statements, such as return, continue, break, and throw in finally blocks.
     "no-unsafe-finally": true,
 
-    // Do not allow variables to be used before they are declared.
-    "no-use-before-declare": true,
-
-    // // Expressions must always return a value. Avoids common errors like const myValue = functionReturningVoid();
+    // Expressions must always return a value. Avoids common errors like const myValue = functionReturningVoid();
     // "no-void-expression": [true, "ignore-arrow-function-shorthand"],
 
     // Disallow duplicate imports in the same file.

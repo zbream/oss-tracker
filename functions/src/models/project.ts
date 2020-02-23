@@ -1,6 +1,5 @@
 import { propertiesOf } from '../utils';
 
-// tslint:disable-next-line no-empty-interface
 export interface NewProject
   extends Pick<Project, 'name' | 'linkUrl' | 'linkChangelog' | 'nextTag'> {}
 

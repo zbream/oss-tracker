@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 
 import { AddProjectDialogComponent } from '../components/add-project-dialog/add-project-dialog.component';
@@ -8,11 +8,11 @@ import { AddProjectDialogComponent } from '../components/add-project-dialog/add-
 export class ReleasesDialogService {
 
   constructor(
-    private dialog: MatDialog,
+    private _dialog: MatDialog,
   ) {}
 
   showAddDialog$(): Observable<undefined> {
-    return this.dialog.open(AddProjectDialogComponent, {
+    return this._dialog.open(AddProjectDialogComponent, {
       width: '400px',
     }).afterClosed();
   }

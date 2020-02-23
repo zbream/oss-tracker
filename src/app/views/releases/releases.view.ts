@@ -23,13 +23,13 @@ export class ReleasesView implements OnInit {
   _refreshedDate$: Observable<Date | undefined>;
 
   constructor(
-    private projectsApi: ProjectsApiService,
-    private releasesDialog: ReleasesDialogService,
-    private notification: NotificationService,
+    private _projectsApi: ProjectsApiService,
+    private _releasesDialog: ReleasesDialogService,
+    private _notification: NotificationService,
   ) {
     this._filterFormControl = new FormControl('');
 
-    const projects$ = this.projectsApi.getProjects$();
+    const projects$ = this._projectsApi.getProjects$();
     const filter$ = this._filterFormControl.valueChanges.pipe(
       debounceTime(150),
       startWith(this._filterFormControl.value),
@@ -48,29 +48,25 @@ export class ReleasesView implements OnInit {
       }),
     );
 
-    this._refreshInProgress$ = this.projectsApi.getRefreshInProgress$();
-    this._refreshedDate$ = this.projectsApi.getRefreshedDate$();
+    this._refreshInProgress$ = this._projectsApi.getRefreshInProgress$();
+    this._refreshedDate$ = this._projectsApi.getRefreshedDate$();
   }
 
   ngOnInit() { }
 
   _onRefresh() {
-    this.projectsApi.refreshProjects().subscribe({
+    this._projectsApi.refreshProjects().subscribe({
       next: message => {
-        this.notification.show(message);
+        this._notification.show(message);
       },
       error: err => {
-        this.notification.show(err);
+        this._notification.show(err);
       },
     });
   }
 
   _onAdd() {
-    this.releasesDialog.showAddDialog$().subscribe();
-    // this.projectsApi.addProject({ name: 'rxjs', linkUrl: '', linkChangelog: '' }).subscribe({
-    //   next: () => console.log('Added successfully.'),
-    //   error: err => console.error(err),
-    // });
+    this._releasesDialog.showAddDialog$().subscribe();
   }
 
   readonly _trackByFn: TrackByFunction<Project> = (_index, item) => item.id;
