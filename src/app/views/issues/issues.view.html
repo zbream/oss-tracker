@@ -6,6 +6,9 @@
       [refreshing]="_refreshInProgress$ | async"
       (add)="_onAdd()"
       (refresh)="_onRefresh()">
+      <button mat-icon-button (click)="_toggleRecent()" [matTooltip]="(_recent$ | async) ? 'Show All' : 'Show Open/Recent'">
+        <mat-icon [style.opacity]="(_recent$ | async) ? 1 : .25">schedule</mat-icon>
+      </button>
     </oss-command-bar>
   </div>
 

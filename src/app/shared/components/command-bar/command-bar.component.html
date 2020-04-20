@@ -10,10 +10,11 @@
     </button>
   </mat-form-field>
   <span fxFlex fxLayoutAlign="end">
-    <button mat-icon-button (click)="_onAdd()">
+    <ng-content></ng-content>
+    <button mat-icon-button (click)="_onAdd()" matTooltip="Add">
       <mat-icon>add</mat-icon>
     </button>
-    <button mat-icon-button (click)="_onRefresh()">
+    <button mat-icon-button (click)="_onRefresh()" matTooltip="Refresh">
       <mat-icon [class.refreshing]="refreshing">refresh</mat-icon>
     </button>
   </span>

@@ -1,7 +1,7 @@
 import { Component, OnInit, TrackByFunction } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { combineLatest, Observable } from 'rxjs';
-import { debounceTime, map, startWith } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { debounceTime, map, startWith, switchMap } from 'rxjs/operators';
 
 import { IssuesApiService } from '../../api-services/interfaces';
 import { Issue } from '../../models/issue';
@@ -16,11 +16,15 @@ import { IssuesFilterFn } from './utils/issues-filter';
 })
 export class IssuesView implements OnInit {
 
+  private _recentSubject = new BehaviorSubject(true);
+
   _filterFormControl: FormControl;
 
   _filteredIssues$: Observable<Issue[]>;
   _refreshInProgress$: Observable<boolean>;
   _refreshedDate$: Observable<Date | undefined>;
+
+  _recent$: Observable<boolean>;
 
   constructor(
     private _issuesApi: IssuesApiService,
@@ -29,7 +33,11 @@ export class IssuesView implements OnInit {
   ) {
     this._filterFormControl = new FormControl('');
 
-    const issues$ = this._issuesApi.getIssues$();
+    this._recent$ = this._recentSubject.asObservable();
+    const issues$ = this._recent$.pipe(
+      switchMap(recent => this._issuesApi.getIssues$(recent)),
+    );
+
     const filter$ = this._filterFormControl.valueChanges.pipe(
       debounceTime(150),
       startWith(this._filterFormControl.value),
@@ -67,6 +75,10 @@ export class IssuesView implements OnInit {
 
   _onAdd() {
     this._issuesDialog.showAddDialog$().subscribe();
+  }
+
+  _toggleRecent() {
+    this._recentSubject.next(!this._recentSubject.value);
   }
 
   readonly _trackByFn: TrackByFunction<Issue> = (index, item) => item.id;

@@ -23,6 +23,10 @@ interface ApiProject {
   };
 }
 
+interface ApiProjectId extends ApiProject {
+  id: string;
+}
+
 interface ApiProjectState {
   refreshInProgress: boolean;
   refreshed?: firestore.Timestamp | string;
@@ -42,7 +46,7 @@ export class FirebaseProjectsApiService implements ProjectsApiService {
   }
 
   getProjects$(): Observable<Project[]> {
-    return collectionData<ApiProject & { id: string }>(this._fbFirestore.collection('projects')).pipe(
+    return collectionData<ApiProjectId>(this._fbFirestore.collection('projects')).pipe(
       map(projects => projects.map(project => this._parseProject(project.id, project))),
     );
   }

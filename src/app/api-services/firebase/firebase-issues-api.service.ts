@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, zip } from 'rxjs';
 import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 
 import { firestore } from 'firebase/app';
@@ -10,6 +10,9 @@ import { Issue, NewIssue } from '../../models/issue';
 import { IssuesApiService } from '../interfaces';
 import { ApiResult, FirebaseResponseService } from './firebase-response.service';
 import { FirebaseService } from './firebase.service';
+
+// How far back is "recent", in days.
+const RECENT_DAYS = 14;
 
 interface ApiIssue {
   projectName: string;
@@ -22,6 +25,10 @@ interface ApiIssue {
     linkProject: string;
     linkIssue: string;
   };
+}
+
+interface ApiIssueId extends ApiIssue {
+  id: string;
 }
 
 interface ApiIssueState {
@@ -42,8 +49,27 @@ export class FirebaseIssuesApiService implements IssuesApiService {
     this._fbFirestore = this._fbService.app.firestore();
   }
 
-  getIssues$(): Observable<Issue[]> {
-    return collectionData<ApiIssue & { id: string }>(this._fbFirestore.collection('issues'), 'id').pipe(
+  getIssues$(recent = true): Observable<Issue[]> {
+    let data: Observable<ApiIssueId[]>;
+    if (recent) {
+      const today = new Date();
+      const minDate = new Date(today.setDate(today.getDate() - RECENT_DAYS));
+      const openQuery = this._fbFirestore.collection('issues')
+        .where('data.status', '==', 'OPEN');
+      const closedQuery = this._fbFirestore.collection('issues')
+        .where('data.status', '==', 'CLOSED')
+        .where('data.closedDate', '>=', minDate);
+      data = zip(
+        collectionData<ApiIssueId>(openQuery, 'id'),
+        collectionData<ApiIssueId>(closedQuery, 'id'),
+      ).pipe(
+        map(([a1, a2]) => ([...a1, ...a2])),
+      );
+    } else {
+      const query = this._fbFirestore.collection('issues');
+      data = collectionData<ApiIssueId>(query, 'id');
+    }
+    return data.pipe(
       map(issues => issues.map(issue => this._parseIssue(issue.id, issue))),
     );
   }

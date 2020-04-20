@@ -6,7 +6,7 @@ import { NewProject, Project } from '../models/project';
 // tslint:disable max-classes-per-file
 
 export abstract class IssuesApiService {
-  abstract getIssues$(): Observable<Issue[]>;
+  abstract getIssues$(recent?: boolean): Observable<Issue[]>;
   abstract getRefreshInProgress$(): Observable<boolean>;
   abstract getRefreshedDate$(): Observable<Date | undefined>;
   abstract addIssue(newIssue: NewIssue): Observable<string>;

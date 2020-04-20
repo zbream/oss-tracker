@@ -11,7 +11,7 @@
     "lint:ts": "ng lint",
     "lint:style": "stylelint \"@(src|projects)/**/*.?(s)css\"",
     "e2e": "ng e2e",
-    "publish": "npm run build && firebase deploy"
+    "publish": "npm run build:shell && firebase deploy"
   },
   "private": true,
   "dependencies": {
