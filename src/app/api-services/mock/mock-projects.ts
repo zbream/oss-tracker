@@ -68,5 +68,5 @@ export const MOCK_PROJECTS: Project[] = [
 ];
 
 function uid(name: string): string {
-  return btoa(`${name}`);
+  return `${name}`;
 }

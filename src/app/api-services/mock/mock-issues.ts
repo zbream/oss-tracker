@@ -30,5 +30,5 @@ export const MOCK_ISSUES: Issue[] = [
 ];
 
 function uid(project: string, issue: number): string {
-  return btoa(`${project}/${issue}`);
+  return `${project}/${issue}`;
 }
